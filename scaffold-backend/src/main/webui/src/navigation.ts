@@ -6,7 +6,7 @@ interface NavigationState {
   entityId?: string;
 }
 
-const TAB_TOPICS: Record<string, string> = {
+const DEFAULT_TAB_TOPICS: Record<string, string> = {
   "cases": "case-explorer",
   "work-items": "work-item",
   "queues": "queue",
@@ -19,7 +19,7 @@ const TAB_TOPICS: Record<string, string> = {
   "system": "system",
 };
 
-const SLUG_TO_LABEL: Record<string, string> = {
+const DEFAULT_SLUG_TO_LABEL: Record<string, string> = {
   "cases": "Cases",
   "work-items": "Work Items",
   "queues": "Queues",
@@ -31,6 +31,20 @@ const SLUG_TO_LABEL: Record<string, string> = {
   "sessions": "Sessions",
   "system": "System",
 };
+
+let activeTabTopics: Record<string, string> = DEFAULT_TAB_TOPICS;
+let activeSlugToLabel: Record<string, string> = DEFAULT_SLUG_TO_LABEL;
+
+export function configurePerspectiveNavigation(perspectiveTabs: Array<{ id: string; label: string }>) {
+  const topics: Record<string, string> = {};
+  const slugs: Record<string, string> = {};
+  for (const tab of perspectiveTabs) {
+    topics[tab.id] = tab.id;
+    slugs[tab.id] = tab.label;
+  }
+  activeTabTopics = topics;
+  activeSlugToLabel = slugs;
+}
 
 export function parseHash(hash: string): NavigationState | null {
   const match = hash.match(/^#\/([a-z-]+)(?:\/(.+))?$/);
@@ -46,12 +60,12 @@ export function setupNavigation(site: LiveSite, appContainer: HTMLElement) {
   function navigate() {
     const state = parseHash(location.hash);
     if (!state) return;
-    const label = SLUG_TO_LABEL[state.tab];
+    const label = activeSlugToLabel[state.tab];
     if (label) {
       site.navigate(label);
     }
     if (state.entityId) {
-      const topic = TAB_TOPICS[state.tab];
+      const topic = activeTabTopics[state.tab];
       if (topic) {
         setTimeout(() => {
           emitPagesEvent(appContainer, `${topic}:selected`, { id: state.entityId });

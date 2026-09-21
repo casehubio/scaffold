@@ -1,10 +1,12 @@
 package io.casehub.flow.rest;
 
+import io.casehub.flow.perspective.PerspectiveProducer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +18,27 @@ public class ModuleRegistryResource {
     private final List<String> modules;
 
     @Inject
-    public ModuleRegistryResource() {
-        var detected = new ArrayList<String>();
-        probeClass("io.casehub.api.engine.CaseHubRuntime", "engine", detected);
-        probeClass("io.casehub.work.runtime.service.WorkItemService", "work", detected);
-        probeClass("io.casehub.engine.plan.DagPlan", "planning", detected);
-        probeClass("io.casehub.ledger.LedgerService", "ledger", detected);
-        probeClass("io.casehub.ops.app.OpsApplication", "ops", detected);
-        probeClass("io.casehub.iot.webapp.IoTApplication", "iot", detected);
-        this.modules = List.copyOf(detected);
+    public ModuleRegistryResource(PerspectiveProducer perspectiveProducer) {
+        var perspective = perspectiveProducer.getConfig();
+        if (perspective.isPresent()) {
+            var config = perspective.get();
+            var active = new ArrayList<>(config.modules().required());
+            for (var opt : config.modules().optional()) {
+                if (probeClass(resolveProbeClass(opt))) {
+                    active.add(opt);
+                }
+            }
+            this.modules = List.copyOf(active);
+        } else {
+            var detected = new ArrayList<String>();
+            probeModule("io.casehub.api.engine.CaseHubRuntime", "engine", detected);
+            probeModule("io.casehub.work.runtime.service.WorkItemService", "work", detected);
+            probeModule("io.casehub.engine.plan.DagPlan", "planning", detected);
+            probeModule("io.casehub.ledger.LedgerService", "ledger", detected);
+            probeModule("io.casehub.ops.app.OpsApplication", "ops", detected);
+            probeModule("io.casehub.iot.webapp.IoTApplication", "iot", detected);
+            this.modules = List.copyOf(detected);
+        }
     }
 
     @GET
@@ -32,11 +46,35 @@ public class ModuleRegistryResource {
         return Map.of("modules", modules);
     }
 
-    private static void probeClass(String className, String moduleName, List<String> target) {
+    private static String resolveProbeClass(String moduleName) {
+        return switch (moduleName) {
+            case "engine" -> "io.casehub.api.engine.CaseHubRuntime";
+            case "work" -> "io.casehub.work.runtime.service.WorkItemService";
+            case "planning" -> "io.casehub.engine.plan.DagPlan";
+            case "ledger" -> "io.casehub.ledger.LedgerService";
+            case "ops" -> "io.casehub.ops.app.OpsApplication";
+            case "iot" -> "io.casehub.iot.webapp.IoTApplication";
+            case "ops-compliance" -> "io.casehub.ops.compliance.ComplianceGoalCompiler";
+            case "ops-deployment" -> "io.casehub.ops.deployment.DeploymentGoalCompiler";
+            case "desiredstate" -> "io.casehub.desiredstate.api.GoalCompiler";
+            case "qhorus" -> "io.casehub.qhorus.api.QhorusChannel";
+            case "eidos" -> "io.casehub.eidos.api.AgentDescriptor";
+            default -> moduleName;
+        };
+    }
+
+    private static boolean probeClass(String className) {
         try {
             Class.forName(className, false, Thread.currentThread().getContextClassLoader());
-            target.add(moduleName);
+            return true;
         } catch (ClassNotFoundException ignored) {
+            return false;
+        }
+    }
+
+    private static void probeModule(String className, String moduleName, List<String> target) {
+        if (probeClass(className)) {
+            target.add(moduleName);
         }
     }
 }

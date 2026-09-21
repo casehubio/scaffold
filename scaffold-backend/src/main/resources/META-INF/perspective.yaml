@@ -1,0 +1,40 @@
+perspective:
+  name: ops
+  description: "CaseHub operations management"
+  version: "1.0"
+
+  modules:
+    required: [engine, desiredstate, work]
+    optional: [ops-deployment, ops-compliance]
+
+  views:
+    tabs:
+      - id: fleet
+        label: "Fleet"
+        view: fleet-dashboard
+      - id: deploy
+        label: "Deploy"
+        view: deployment-wizard
+      - id: health
+        label: "Health"
+        view: health-monitor
+      - id: drift
+        label: "Drift"
+        view: drift-detection
+      - id: situations
+        label: "Situations"
+        view: situation-manager
+      - id: updates
+        label: "Updates"
+        view: update-manager
+
+  datasets:
+    deployments:
+      endpoint: /api/ops/deployments
+      source: ops-app
+    health:
+      endpoint: /api/ops/health
+      source: ops-app
+    drift:
+      endpoint: /api/ops/drift
+      source: desiredstate

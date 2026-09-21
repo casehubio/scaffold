@@ -10,6 +10,16 @@ function rest(id: string, url: string, opts?: {
   return opts?.refreshTime ? { ...binding, refreshTime: opts.refreshTime } : binding;
 }
 
+interface PerspectiveDatasetDef {
+  name: string;
+  endpoint: string;
+  source: string;
+}
+
+export function createPerspectiveDatasets(defs: PerspectiveDatasetDef[]) {
+  return defs.map(d => rest(d.name, d.endpoint, { refreshTime: "10second" }));
+}
+
 export function createDatasets(modules: string[]) {
   const datasets = [
     rest("cases", "/api/v1/cases", { dataPath: "items", refreshTime: "10second" }),

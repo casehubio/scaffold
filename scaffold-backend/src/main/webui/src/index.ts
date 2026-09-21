@@ -1,7 +1,7 @@
 import { loadSite } from "@casehubio/pages-runtime";
 import { page, tabs } from "@casehubio/pages-ui";
 import "@casehubio/pages-ui-tokens";
-import { createDatasets } from "./datasets";
+import { createDatasets, createPerspectiveDatasets } from "./datasets";
 import { casesView } from "./views/cases";
 import { workItemsView } from "./views/work-items";
 import { queuesView } from "./views/queues";
@@ -12,16 +12,45 @@ import { iotView } from "./views/iot";
 import { notificationsView } from "./views/notifications";
 import { sessionsView } from "./views/sessions";
 import { systemView } from "./views/system";
-import { setupNavigation } from "./navigation";
+import { fleetView } from "./views/fleet";
+import { deployView } from "./views/deploy";
+import { healthView } from "./views/health";
+import { driftView } from "./views/drift";
+import { situationsView } from "./views/situations";
+import { updatesView } from "./views/updates";
+import { setupNavigation, configurePerspectiveNavigation } from "./navigation";
 
 type TabEntry = [string, ...unknown[]];
 
-async function start() {
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const VIEW_REGISTRY: Record<string, unknown> = {
+  "fleet-dashboard": fleetView,
+  "deployment-wizard": deployView,
+  "health-monitor": healthView,
+  "drift-detection": driftView,
+  "situation-manager": situationsView,
+  "update-manager": updatesView,
+};
 
-  const { modules } = await fetch("/api/modules").then(r => r.json());
+interface PerspectiveTab {
+  id: string;
+  label: string;
+  view: string;
+}
 
-  const allTabs: TabEntry[] = [
+interface PerspectiveDatasetDef {
+  name: string;
+  endpoint: string;
+  source: string;
+}
+
+interface PerspectiveResponse {
+  name: string;
+  tabs: PerspectiveTab[];
+  datasets: PerspectiveDatasetDef[];
+}
+
+function buildDefaultTabs(modules: string[]): TabEntry[] {
+  return [
     ["Cases", casesView],
     ["Work Items", workItemsView],
     ["Queues", queuesView],
@@ -33,10 +62,38 @@ async function start() {
     ["Sessions", sessionsView],
     ["System", systemView],
   ];
+}
+
+async function start() {
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  const perspectiveResp = await fetch("/api/perspective");
+  let allTabs: TabEntry[];
+  let datasets;
+  let defaultTab: string;
+
+  if (perspectiveResp.ok) {
+    const perspective: PerspectiveResponse = await perspectiveResp.json();
+    allTabs = perspective.tabs
+      .map((t) => {
+        const view = VIEW_REGISTRY[t.view];
+        if (!view) console.warn(`Perspective tab "${t.label}" references unknown view "${t.view}"`);
+        return [t.label, view] as TabEntry;
+      })
+      .filter(([, v]) => v != null);
+    datasets = createPerspectiveDatasets(perspective.datasets);
+    configurePerspectiveNavigation(perspective.tabs);
+    defaultTab = allTabs.length > 0 ? (allTabs[0][0] as string) : "Fleet";
+  } else {
+    const { modules } = await fetch("/api/modules").then(r => r.json());
+    allTabs = buildDefaultTabs(modules);
+    datasets = createDatasets(modules);
+    defaultTab = "Cases";
+  }
 
   const app = page("CaseHub Console",
     tabs(...allTabs),
-    { settings: { mode: prefersDark ? "dark" : "light" }, datasets: createDatasets(modules) },
+    { settings: { mode: prefersDark ? "dark" : "light" }, datasets },
   );
 
   const container = document.getElementById("app");
@@ -46,7 +103,7 @@ async function start() {
     setupNavigation(site, container);
 
     if (!location.hash) {
-      site.navigate("Cases");
+      site.navigate(defaultTab);
     }
 
     const picker = document.createElement("pages-theme-picker");
