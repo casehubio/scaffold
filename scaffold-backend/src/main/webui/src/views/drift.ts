@@ -4,9 +4,9 @@ import { lookup, col, groupBy } from "@casehubio/pages-ui";
 export const driftView = rows(
   title("Drift", "h2"),
   dataTable({
-    lookup: lookup("drift", groupBy(null,
-      col("deploymentId"), col("node"), col("expected"),
-      col("actual"), col("severity"),
+    lookup: lookup("reconciliation", groupBy(null,
+      col("clusterId"), col("clusterName"),
+      col("active"), col("nodeCount"),
     )),
     sortable: true,
   }),

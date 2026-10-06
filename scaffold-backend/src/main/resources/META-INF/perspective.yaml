@@ -29,12 +29,21 @@ perspective:
         view: update-manager
 
   datasets:
+    applications:
+      endpoint: /api/ops/applications
+      source: ops-service
     deployments:
       endpoint: /api/ops/deployments
-      source: ops-app
-    health:
-      endpoint: /api/ops/health
-      source: ops-app
-    drift:
-      endpoint: /api/ops/drift
-      source: desiredstate
+      source: ops-service
+    clusters:
+      endpoint: /api/ops/clusters
+      source: ops-service
+    reconciliation:
+      endpoint: /api/ops/reconciliation
+      source: ops-service
+    cases:
+      endpoint: /api/ops/cases
+      source: ops-service
+    approvals:
+      endpoint: /api/ops/approvals
+      source: ops-service

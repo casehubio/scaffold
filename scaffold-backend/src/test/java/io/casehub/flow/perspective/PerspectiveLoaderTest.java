@@ -62,6 +62,17 @@ class PerspectiveLoaderTest {
     }
 
     @Test
+    void classpathPerspectiveHasAllOpsDatasets() {
+        var config = PerspectiveLoader.loadFromClasspath().orElseThrow();
+        var names = config.datasets().stream().map(PerspectiveDataset::name).toList();
+        assertThat(names).containsExactlyInAnyOrder(
+            "applications", "deployments", "clusters", "reconciliation", "cases", "approvals");
+
+        var endpoints = config.datasets().stream().map(PerspectiveDataset::endpoint).toList();
+        assertThat(endpoints).allMatch(e -> e.startsWith("/api/ops/"));
+    }
+
+    @Test
     void handlesMinimalPerspective() {
         var yaml = """
                 perspective:

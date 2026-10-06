@@ -36,6 +36,26 @@ class PerspectiveResourceTest {
         assertThat(response.getStatus()).isEqualTo(404);
     }
 
+    @Test
+    void classpathPerspectiveServesAllOpsTabs() {
+        var config = PerspectiveLoader.loadFromClasspath().orElseThrow();
+        var producer = new StubProducer(Optional.of(config));
+        var resource = new PerspectiveResource(producer);
+
+        var response = resource.getPerspective();
+        assertThat(response.getStatus()).isEqualTo(200);
+        var entity = (PerspectiveConfig) response.getEntity();
+        assertThat(entity.tabs()).hasSize(6);
+        assertThat(entity.tabs().stream().map(PerspectiveTab::id).toList())
+            .containsExactly("fleet", "deploy", "health", "drift", "situations", "updates");
+        assertThat(entity.datasets()).hasSize(6);
+        assertThat(entity.datasets().stream().map(PerspectiveDataset::name).toList())
+            .containsExactlyInAnyOrder("applications", "deployments", "clusters",
+                "reconciliation", "cases", "approvals");
+        assertThat(entity.datasets().stream().map(PerspectiveDataset::endpoint).toList())
+            .allMatch(e -> e.startsWith("/api/ops/"));
+    }
+
     static class StubProducer extends PerspectiveProducer {
         private final Optional<PerspectiveConfig> config;
         StubProducer(Optional<PerspectiveConfig> config) { this.config = config; }
