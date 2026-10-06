@@ -1,16 +1,20 @@
-import { tabs, hostPanel } from "@casehubio/pages-ui";
+import { tabs, hostPanel, rows, dataTable, lookup, col, groupBy } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-case-explorer";
 import "@casehubio/blocks-ui-preferences-editor";
 import "@casehubio/blocks-ui-kpi-metric-row";
 
-registerPanel("case-definition-browser", "blocks-case-definition-browser");
 registerPanel("preferences-editor", "blocks-preferences-editor");
 
 export const systemView = tabs(
-  ["Definitions", hostPanel("case-definition-browser", {
-    endpoint: "/api/v1/case-definitions",
-  })],
+  ["Definitions", rows(
+    dataTable({
+      lookup: lookup("case-definitions", groupBy(null,
+        col("namespace"), col("name"), col("version"),
+      )),
+      sortable: true,
+      filter: { enabled: true },
+    }),
+  )],
   ["Preferences", hostPanel("preferences-editor", {
     endpoint: "/api/preferences",
   })],

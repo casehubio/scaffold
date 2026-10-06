@@ -15,7 +15,6 @@ const DEFAULT_TAB_TOPICS: Record<string, string> = {
   "operations": "selected-app",
   "iot": "selected-device",
   "notifications": "notification",
-  "sessions": "session",
   "system": "system",
 };
 
@@ -28,7 +27,6 @@ const DEFAULT_SLUG_TO_LABEL: Record<string, string> = {
   "operations": "Operations",
   "iot": "IoT",
   "notifications": "Notifications",
-  "sessions": "Sessions",
   "system": "System",
 };
 

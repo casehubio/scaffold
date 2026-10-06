@@ -10,7 +10,6 @@ import { trustAuditView } from "./views/trust-audit";
 import { operationsView } from "./views/operations";
 import { iotView } from "./views/iot";
 import { notificationsView } from "./views/notifications";
-import { sessionsView } from "./views/sessions";
 import { systemView } from "./views/system";
 import { fleetView } from "./views/fleet";
 import { deployView } from "./views/deploy";
@@ -59,7 +58,6 @@ function buildDefaultTabs(modules: string[]): TabEntry[] {
     ...(modules.includes("ops") ? [["Operations", operationsView] as TabEntry] : []),
     ...(modules.includes("iot") ? [["IoT", iotView] as TabEntry] : []),
     ["Notifications", notificationsView],
-    ["Sessions", sessionsView],
     ["System", systemView],
   ];
 }
