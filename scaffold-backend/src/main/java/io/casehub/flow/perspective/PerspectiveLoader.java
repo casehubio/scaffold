@@ -2,7 +2,7 @@ package io.casehub.flow.perspective;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.casehub.yaml.jackson.YamlMappers;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class PerspectiveLoader {
 
-    private static final ObjectMapper YAML = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper YAML = YamlMappers.create();
 
     public static Optional<PerspectiveConfig> parse(String yaml) {
         if (yaml == null || yaml.isBlank()) return Optional.empty();
