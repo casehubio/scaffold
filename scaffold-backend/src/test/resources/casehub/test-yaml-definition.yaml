@@ -1,6 +1,6 @@
 dsl: "0.1"
 version: "1.0.0"
-name: YAML Test Case
+name: yaml-test-case
 namespace: test-yaml
 title: Test case loaded from YAML
 spec:

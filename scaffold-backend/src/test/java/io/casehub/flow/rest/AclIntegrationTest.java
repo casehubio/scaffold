@@ -4,27 +4,21 @@ import io.casehub.flow.profile.JwtAclTestProfile;
 import io.casehub.platform.api.acl.AccessControlProvider;
 import io.casehub.platform.api.acl.AclAction;
 import io.casehub.platform.api.identity.CurrentPrincipal;
-import io.quarkus.arc.Arc;
-import io.quarkus.arc.ManagedContext;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.security.TestSecurity;
 import io.quarkus.test.security.oidc.Claim;
 import io.quarkus.test.security.oidc.OidcSecurity;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-@Disabled("ACL API changed: grant() now takes ResourceId, not String — re-enable after migration")
 @QuarkusTest
 @TestProfile(JwtAclTestProfile.class)
 class AclIntegrationTest {
@@ -36,31 +30,20 @@ class AclIntegrationTest {
   @Inject AccessControlProvider acl;
   @Inject CurrentPrincipal currentPrincipal;
 
-    private void grant(String actorId, String resourceId, AclAction action) {
-        try {
-            CompletableFuture.runAsync(() -> {
-                ManagedContext requestContext = Arc.container().requestContext();
-                requestContext.activate();
-                try {
-                    acl.grant(actorId, io.casehub.platform.api.acl.ResourceId.fromString(resourceId), action, null);
-                } finally {
-                    requestContext.terminate();
-                }
-            }).get(5, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+  private void grant(String actorId, String resourceId, AclAction action) {
+        acl.grant(actorId, io.casehub.platform.api.acl.ResourceId.fromString(resourceId), action, null);
     }
 
 
     // --- Config-based principal (fallback, no @TestSecurity) ---
 
   @Test
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testPrincipalConfigured() {
     assertThat(currentPrincipal.actorId()).isEqualTo(ACTOR_ID);
     assertThat(currentPrincipal.tenancyId()).isEqualTo(TENANT_ID);
   }
+
 
   // --- CaseDefinitionResource ---
 
@@ -83,7 +66,6 @@ class AclIntegrationTest {
   }
 
   @Test
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testAllowReadDefinitionAfterGrant() {
     String resourceId = "CASE_DEFINITION" + ":allow-ns/allow-def";
     grant(ACTOR_ID, resourceId, AclAction.READ);
@@ -232,7 +214,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = "jwt-actor", roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "jwt-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testAllowAfterGrantWithJwtIdentity() {
     String resourceId = "CASE_DEFINITION" + ":jwt-ns/jwt-def";
     grant("jwt-actor", resourceId, AclAction.READ);
@@ -248,7 +229,7 @@ class AclIntegrationTest {
 
   private static final String JWT_ACTOR = "jwt-actor";
   private static final String DEF_NS = "test-yaml";
-  private static final String DEF_NAME = "YAML Test Case";
+  private static final String DEF_NAME = "yaml-test-case";
   private static final String DEF_VERSION = "1.0.0";
   private static final String DEF_RESOURCE =
       "CASE_DEFINITION" + ":" + DEF_NS + "/" + DEF_NAME;
@@ -282,23 +263,21 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testReadDefinitionWithJwt() {
     grant(JWT_ACTOR, DEF_RESOURCE, AclAction.READ);
 
     given()
-        .when()
-        .get("/api/v1/case-definitions/" + DEF_NS + "/" + DEF_NAME)
-        .then()
-        .statusCode(200)
-        .body("[0].namespace", equalTo(DEF_NS))
-        .body("[0].name", equalTo(DEF_NAME));
+            .when()
+            .get("/api/v1/case-definitions/" + DEF_NS + "/" + DEF_NAME)
+            .then()
+            .statusCode(200)
+            .body("[0].namespace", equalTo(DEF_NS))
+            .body("[0].name", equalTo(DEF_NAME));
   }
 
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testReadDefinitionByVersionWithJwt() {
     grant(JWT_ACTOR, DEF_RESOURCE, AclAction.READ);
 
@@ -314,7 +293,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testStartCaseWithJwt() {
     grant(JWT_ACTOR, DEF_RESOURCE, AclAction.WRITE);
 
@@ -338,7 +316,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testGetCaseInstanceWithJwt() {
     String caseId = startCaseAsJwtActor();
 
@@ -355,7 +332,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testGetCaseContextWithJwt() {
     String caseId = startCaseAsJwtActor();
 
@@ -369,7 +345,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testSuspendCaseWithJwt() {
     String caseId = startCaseAsJwtActor();
 
@@ -387,7 +362,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testCancelCaseWithJwt() {
     String caseId = startCaseAsJwtActor();
 
@@ -405,7 +379,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testSendSignalWithJwt() {
     String caseId = startCaseAsJwtActor();
 
@@ -425,7 +398,6 @@ class AclIntegrationTest {
   @Test
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
-  @Disabled("scaffold#37 — Vert.x event loop blocking")
   void testGetEventLogWithJwt() {
     String caseId = startCaseAsJwtActor();
 

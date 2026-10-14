@@ -19,7 +19,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
  * omit it from the exclusion list.
  */
 @Alternative
-@Priority(1)
+@Priority(200)
 @ApplicationScoped
 public class JwtAwareTestPrincipal implements CurrentPrincipal {
 

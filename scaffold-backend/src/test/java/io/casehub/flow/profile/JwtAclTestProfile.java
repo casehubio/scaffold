@@ -14,15 +14,20 @@ public class JwtAclTestProfile implements QuarkusTestProfile {
 
   @Override
   public Map<String, String> getConfigOverrides() {
-      return Map.of(
-              "quarkus.arc.exclude-types",
-              "io.casehub.platform.oidc.OidcCurrentPrincipal,io.casehub.work.runtime.service.NoOpGroupMembershipProvider,io.casehub.work.runtime.service.TenantScopedPrincipal",
-              "casehub.platform.principal.actorId", "test-actor",
-              "casehub.tenancy.default-id", "test-tenant",
-              "casehub.cbr.retention.case-types", "test",
-              "casehub.cbr.retention.domain", "test",
-              "casehub.cbr.trust-retention.case-types", "test",
-              "casehub.cbr.trust-retention.domain", "test",
-              "casehub.memory.retention.domain", "test");
+      return Map.ofEntries(
+              Map.entry("quarkus.arc.exclude-types",
+                  "io.casehub.platform.oidc.SecurityIdentityCurrentPrincipal,io.casehub.work.runtime.service.NoOpGroupMembershipProvider,io.casehub.work.runtime.service.TenantScopedPrincipal,io.casehub.connectors.**,io.casehub.engine.rest.health.AclEnforcementHealthCheck"),
+              Map.entry("quarkus.oidc.devservices.enabled", "false"),
+              Map.entry("casehub.platform.principal.actorId", "test-actor"),
+              Map.entry("casehub.tenancy.default-id", "test-tenant"),
+              Map.entry("casehub.cbr.retention.case-types", "test"),
+              Map.entry("casehub.cbr.retention.domain", "test"),
+              Map.entry("casehub.cbr.trust-retention.case-types", "test"),
+              Map.entry("casehub.cbr.trust-retention.domain", "test"),
+              Map.entry("casehub.memory.retention.domain", "test"),
+              Map.entry("casehub.ops.approval.roles.critical", "ops-admin"),
+              Map.entry("casehub.ops.approval.roles.high", "ops-approver"),
+              Map.entry("casehub.ops.k8s.approval.critical-namespaces", "kube-system"),
+              Map.entry("casehub.ops.k8s.approval.production-namespaces", "production"));
   }
 }
