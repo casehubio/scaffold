@@ -45,7 +45,6 @@ nb-configuration.xml
 # TLS Certificates
 .certs/
 .claude
-package-lock.json
 wksp
 proj
 .playwright-mcp/
