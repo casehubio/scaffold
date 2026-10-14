@@ -15,99 +15,73 @@
  */
 package io.casehub.flow.rest;
 
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
 import static io.restassured.RestAssured.given;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import java.util.Map;
-import java.util.UUID;
-import org.junit.jupiter.api.Test;
-
 @QuarkusTest
-class SignalResourceIT {
+class SignalResourceIT extends CaseHubIntegrationTestBase {
 
-  @Test
-  void sendSignal_nonExistentCase_returns404() {
-    UUID nonExistentCaseId = UUID.randomUUID();
+    @Test
+    void sendSignal_nonExistentCase_returns404() {
+        UUID nonExistentCaseId = UUID.randomUUID();
 
-    given()
-        .contentType(ContentType.JSON)
-        .body(
-            """
-            {
-              "path": "test.path",
-              "value": "test"
-            }
-            """)
-        .when()
-        .post("/api/v1/cases/{caseId}/signals", nonExistentCaseId)
-        .then()
-        .statusCode(404)
-        .body("title", equalTo("Not found"));
-  }
-
-  @Test
-  void sendSignal_updatesContextAndTriggersWorkers() {
-    // 1. Start a test case
-    UUID caseId = startTestCase();
-
-    // 2. Send signal
-    given()
-        .contentType(ContentType.JSON)
-        .body(
-            """
-            {
-              "path": "approval.status",
-              "value": "approved"
-            }
-            """)
-        .when()
-        .post("/api/v1/cases/{caseId}/signals", caseId)
-        .then()
-        .statusCode(200);
-
-    // 3. Wait for async worker processing
-    await()
-        .atMost(5, SECONDS)
-        .untilAsserted(
-            () -> {
-              // 4. Verify context updated
-              String contextValue =
-                  given()
-                      .when()
-                      .get("/api/v1/cases/{caseId}/context/approval.status", caseId)
-                      .then()
-                      .statusCode(200)
-                      .extract()
-                      .asString();
-
-              assertThat(contextValue).isEqualTo("approved");
-            });
-  }
-
-  private UUID startTestCase() {
-    Map<String, Object> request =
-        Map.of(
-            "definition",
-            Map.of("namespace", "test-api", "name", "Document Approval", "version", "1.0.0"),
-            "context",
-            Map.of("documentId", "DOC-123", "submittedBy", "alice@example.com"));
-
-    String response =
         given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when()
-            .post("/api/v1/cases")
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("caseId");
+                .contentType(ContentType.JSON)
+                .body(
+                        """
+                        {
+                          "path": "test.path",
+                          "value": "test"
+                        }
+                        """)
+                .when()
+                .post("/api/engine/control/send-signal/{caseId}", nonExistentCaseId)
+                .then()
+                .statusCode(404)
+                .body("title", equalTo("Not found"));
+    }
 
-    return UUID.fromString(response);
-  }
+    @Test
+    void sendSignal_updatesContextAndTriggersWorkers() {
+        UUID caseId = startTestCase();
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(
+                        """
+                        {
+                          "path": "approval.status",
+                          "value": "approved"
+                        }
+                        """)
+                .when()
+                .post("/api/engine/control/send-signal/{caseId}", caseId)
+                .then()
+                .statusCode(200);
+
+        await()
+                .atMost(5, SECONDS)
+                .untilAsserted(
+                        () -> {
+                            String contextValue =
+                                    given()
+                                            .when()
+                                            .get("/api/engine/cases/get-case-context-path/{caseId}?path=approval.status", caseId)
+                                            .then()
+                                            .statusCode(200)
+                                            .extract()
+                                            .path("value");
+
+                            assertThat(contextValue).isEqualTo("approved");
+                        });
+    }
 }

@@ -42,12 +42,12 @@ public abstract class CaseHubIntegrationTestBase {
               var response =
                   given()
                       .when()
-                      .get("/api/v1/cases/{caseId}/events", caseId)
+                      .get("/api/engine/events/get-event-log/{caseId}", caseId)
                       .then()
                       .statusCode(200)
                       .extract()
-                      .path("totalElements");
-              return (Integer) response > 0;
+                      .path("totalCount");
+              return ((Number) response).intValue() > 0;
             });
   }
 

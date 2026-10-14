@@ -29,7 +29,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
   private String getCaseStatus(UUID caseId) {
     return given()
         .when()
-        .get("/api/v1/cases/{caseId}", caseId)
+        .get("/api/engine/cases/get-case-by-id/{caseId}", caseId)
         .then()
         .statusCode(200)
         .extract()
@@ -44,7 +44,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", randomCaseId)
+        .post("/api/engine/control/suspend-case/{caseId}", randomCaseId)
         .then()
         .statusCode(404);
   }
@@ -57,7 +57,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", caseId)
+        .post("/api/engine/control/suspend-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -78,7 +78,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", caseId)
+        .post("/api/engine/control/suspend-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -94,7 +94,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/resume", caseId)
+        .post("/api/engine/control/resume-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -115,7 +115,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/resume", caseId)
+        .post("/api/engine/control/resume-case/{caseId}", caseId)
         .then()
         .statusCode(409);
   }
@@ -128,7 +128,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", caseId)
+        .post("/api/engine/control/suspend-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -144,7 +144,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", caseId)
+        .post("/api/engine/control/suspend-case/{caseId}", caseId)
         .then()
         .statusCode(409);
   }
@@ -157,7 +157,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/cancel", caseId)
+        .post("/api/engine/control/cancel-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -180,7 +180,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/suspend", caseId)
+        .post("/api/engine/control/suspend-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -196,7 +196,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/resume", caseId)
+        .post("/api/engine/control/resume-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 
@@ -212,7 +212,7 @@ class CaseControlResourceIT extends CaseHubIntegrationTestBase {
         .contentType("application/json")
         .body("{}")
         .when()
-        .post("/api/v1/cases/{caseId}/cancel", caseId)
+        .post("/api/engine/control/cancel-case/{caseId}", caseId)
         .then()
         .statusCode(200);
 

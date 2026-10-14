@@ -65,6 +65,6 @@ class HealthEndpointIT extends CaseHubIntegrationTestBase {
         .get("/q/health/ready")
         .then()
         .statusCode(200)
-        .body("checks.find { it.name.contains('Reactive') }.status", is("UP"));
+        .body("checks.find { it.name.contains('Database') || it.name.contains('datasource') }.status", is("UP"));
   }
 }

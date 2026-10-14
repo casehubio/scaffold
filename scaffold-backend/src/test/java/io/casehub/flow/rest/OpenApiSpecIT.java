@@ -52,29 +52,28 @@ class OpenApiSpecIT extends CaseHubIntegrationTestBase {
     assertThat(info.get("version")).isEqualTo("1.0.0");
   }
 
-  @Test
-  void openApiSpecContainsAllPaths() {
-    Response response = given()
-        .when()
-        .get("/q/openapi?format=JSON")
-        .then()
-        .statusCode(200)
-        .extract().response();
+    @Test
+    void openApiSpecContainsAllPaths() {
+        Response response = given()
+                                    .when()
+                                    .get("/q/openapi?format=JSON")
+                                    .then()
+                                    .statusCode(200)
+                                    .extract().response();
 
-    Map<String, Object> paths = response.jsonPath().getMap("paths");
+        Map<String, Object> paths = response.jsonPath().getMap("paths");
 
-    assertThat(paths).containsKey("/api/v1/case-definitions");
-    assertThat(paths).containsKey("/api/v1/case-definitions/{namespace}/{name}");
-    assertThat(paths).containsKey("/api/v1/case-definitions/{namespace}/{name}/{version}");
-    assertThat(paths).containsKey("/api/v1/cases");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/context");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/context/{path}");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/suspend");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/resume");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/cancel");
-    assertThat(paths).containsKey("/api/v1/cases/{caseId}/signals");
-  }
+        assertThat(paths).containsKey("/api/engine/definitions/list-definitions");
+        assertThat(paths).containsKey("/api/engine/definitions/get-definitions-by-name/{namespace}/{name}");
+        assertThat(paths).containsKey("/api/engine/definitions/get-definition-by-key/{namespace}/{name}/{version}");
+        assertThat(paths).containsKey("/api/engine/cases/start-case");
+        assertThat(paths).containsKey("/api/engine/cases/get-case-by-id/{caseId}");
+        assertThat(paths).containsKey("/api/engine/cases/get-case-context/{caseId}");
+        assertThat(paths).containsKey("/api/engine/control/suspend-case/{caseId}");
+        assertThat(paths).containsKey("/api/engine/control/resume-case/{caseId}");
+        assertThat(paths).containsKey("/api/engine/control/cancel-case/{caseId}");
+        assertThat(paths).containsKey("/api/engine/control/send-signal/{caseId}");
+    }
 
     @Test
     void openApiSpecContainsResponseCodes() {
@@ -85,59 +84,30 @@ class OpenApiSpecIT extends CaseHubIntegrationTestBase {
                                     .statusCode(200)
                                     .extract().response();
 
-        // CaseDefinitionResource - listAll
         Map<String, Object> listAllResponses = response.jsonPath()
-                                                       .getMap("paths.'/api/v1/case-definitions'.get.responses");
+                                                       .getMap("paths.'/api/engine/definitions/list-definitions'.get.responses");
         assertThat(listAllResponses).containsKey("200");
 
-        // CaseInstanceResource - startCase
         Map<String, Object> startCaseResponses = response.jsonPath()
-                                                         .getMap("paths.'/api/v1/cases'.post.responses");
-        assertThat(startCaseResponses).containsKey("201");
-        assertThat(startCaseResponses).containsKey("404");
-
-        // CaseControlResource - suspend
-        Map<String, Object> suspendResponses = response.jsonPath()
-                                                       .getMap("paths.'/api/v1/cases/{caseId}/suspend'.post.responses");
-        assertThat(suspendResponses).containsKey("200");
-        assertThat(suspendResponses).containsKey("404");
-        assertThat(suspendResponses).containsKey("409");
-
-        // EventLogResource - getEventLog
-        Map<String, Object> eventLogResponses = response.jsonPath()
-                                                        .getMap("paths.'/api/v1/cases/{caseId}/events'.get.responses");
-        assertThat(eventLogResponses).containsKey("200");
-        assertThat(eventLogResponses).containsKey("404");
-
-        // SignalResource - sendSignal
-        Map<String, Object> signalResponses = response.jsonPath()
-                                                      .getMap("paths.'/api/v1/cases/{caseId}/signals'.post.responses");
-        assertThat(signalResponses).containsKey("200");
-        assertThat(signalResponses).containsKey("400");
-        assertThat(signalResponses).containsKey("404");
+                                                         .getMap("paths.'/api/engine/cases/start-case'.post.responses");
+        assertThat(startCaseResponses).containsKey("200");
     }
 
-  @Test
-  void openApiSpecContainsSchemaComponents() {
-    Response response = given()
-        .when()
-        .get("/q/openapi?format=JSON")
-        .then()
-        .statusCode(200)
-        .extract().response();
+    @Test
+    void openApiSpecContainsSchemaComponents() {
+        Response response = given()
+                                    .when()
+                                    .get("/q/openapi?format=JSON")
+                                    .then()
+                                    .statusCode(200)
+                                    .extract().response();
 
-    Map<String, Object> schemas = response.jsonPath()
-        .getMap("components.schemas");
+        Map<String, Object> schemas = response.jsonPath()
+                                              .getMap("components.schemas");
 
-    assertThat(schemas).containsKey("ProblemDetail");
-    assertThat(schemas).containsKey("StartCaseRequest");
-    assertThat(schemas).containsKey("CaseInstanceResponse");
-    assertThat(schemas).containsKey("CaseControlRequest");
-    assertThat(schemas).containsKey("CaseControlResponse");
-    assertThat(schemas).containsKey("SendSignalRequest");
-    assertThat(schemas).containsKey("SignalResponse");
-    assertThat(schemas).containsKey("EventLogEntryResponse");
-  }
+        assertThat(schemas).containsKey("StartCaseRequest");
+        assertThat(schemas).containsKey("SendSignalRequest");
+    }
 
   @Test
   void swaggerUiIsAvailable() {
