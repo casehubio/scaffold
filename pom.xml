@@ -46,20 +46,20 @@
         <repository>
             <id>github</id>
             <name>casehubio GitHub Packages</name>
-            <url>https://maven.pkg.github.com/casehubio/flow</url>
+            <url>https://maven.pkg.github.com/casehubio/scaffold</url>
         </repository>
         <snapshotRepository>
             <id>github</id>
             <name>casehubio GitHub Packages</name>
-            <url>https://maven.pkg.github.com/casehubio/flow</url>
+            <url>https://maven.pkg.github.com/casehubio/scaffold</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/casehubio/flow.git</connection>
-        <developerConnection>scm:git:https://github.com/casehubio/flow.git</developerConnection>
-        <url>https://github.com/casehubio/flow</url>
+        <connection>scm:git:https://github.com/casehubio/scaffold.git</connection>
+        <developerConnection>scm:git:https://github.com/casehubio/scaffold.git</developerConnection>
+        <url>https://github.com/casehubio/scaffold</url>
         <tag>HEAD</tag>
     </scm>
 </project>
