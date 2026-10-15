@@ -52,11 +52,16 @@ jobs:
           if-no-files-found: ignore
           retention-days: 5
 
-      - name: Publish to GitHub Packages
-        if: |
-          (github.event_name == 'pull_request' && github.event.pull_request.merged == true) ||
-          github.event_name == 'workflow_dispatch' ||
-          github.event_name == 'repository_dispatch'
-        run: mvn --batch-mode deploy -DskipTests -pl scaffold-backend
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package scaffold backend
+        if: github.event_name != 'pull_request' || github.event.action != 'closed' || github.event.pull_request.merged == true
+        run: |
+          cd scaffold-backend/target
+          zip -qr "$GITHUB_WORKSPACE/scaffold-backend-0.3.zip" quarkus-app
+
+      - name: Upload scaffold backend
+        if: github.event_name != 'pull_request' || github.event.action != 'closed' || github.event.pull_request.merged == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffold-backend-0.3
+          path: scaffold-backend-0.3.zip
+          if-no-files-found: error
