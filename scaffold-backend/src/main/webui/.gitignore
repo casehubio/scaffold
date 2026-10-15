@@ -1,3 +1,5 @@
 node_modules/
 dist/
 .casehub-packages/
+# Maven SNAPSHOT tarballs change without an npm version change.
+package-lock.json
