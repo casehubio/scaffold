@@ -10,6 +10,6 @@ public class PlatformInfoResolver {
 
     @Query
     public PlatformInfo platformInfo() {
-        return new PlatformInfo("CaseHub", "0.2-SNAPSHOT");
+        return new PlatformInfo("CaseHub", "0.3");
     }
 }
