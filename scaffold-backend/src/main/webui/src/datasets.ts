@@ -10,13 +10,13 @@ function rest(id: string, url: string, opts?: {
   return opts?.refreshTime ? { ...binding, refreshTime: opts.refreshTime } : binding;
 }
 
-interface PerspectiveDatasetDef {
+interface AppDatasetDef {
   name: string;
   endpoint: string;
   source: string;
 }
 
-export function createPerspectiveDatasets(defs: PerspectiveDatasetDef[]) {
+export function createAppDatasets(defs: AppDatasetDef[]) {
   return defs.map(d => rest(d.name, d.endpoint, { refreshTime: "10second" }));
 }
 
@@ -36,8 +36,8 @@ export function createDatasets(modules: string[]) {
 
   if (modules.includes("ops")) {
     datasets.push(
-      rest("applications", "/api/applications", { refreshTime: "10second" }),
-      rest("approvals", "/api/approvals", { refreshTime: "5second" }),
+      rest("applications", "/api/ops/applications", { refreshTime: "10second" }),
+      rest("approvals", "/api/ops/approvals", { refreshTime: "5second" }),
     );
   }
 

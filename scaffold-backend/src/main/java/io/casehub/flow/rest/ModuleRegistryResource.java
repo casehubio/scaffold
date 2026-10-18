@@ -1,6 +1,6 @@
 package io.casehub.flow.rest;
 
-import io.casehub.flow.perspective.PerspectiveProducer;
+import io.casehub.flow.app.AppProducer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -18,10 +18,10 @@ public class ModuleRegistryResource {
     private final List<String> modules;
 
     @Inject
-    public ModuleRegistryResource(PerspectiveProducer perspectiveProducer) {
-        var perspective = perspectiveProducer.getConfig();
-        if (perspective.isPresent()) {
-            var config = perspective.get();
+    public ModuleRegistryResource(AppProducer appProducer) {
+        var appConfig = appProducer.getConfig();
+        if (appConfig.isPresent()) {
+            var config = appConfig.get();
             var active = new ArrayList<>(config.modules().required());
             for (var opt : config.modules().optional()) {
                 if (probeClass(resolveProbeClass(opt))) {
@@ -57,6 +57,7 @@ public class ModuleRegistryResource {
             case "ops-compliance" -> "io.casehub.ops.compliance.ComplianceGoalCompiler";
             case "ops-deployment" -> "io.casehub.ops.deployment.DeploymentGoalCompiler";
             case "desiredstate" -> "io.casehub.desiredstate.api.GoalCompiler";
+            case "ops-service" -> "io.casehub.ops.service.api.OpsApplicationApi";
             case "qhorus" -> "io.casehub.qhorus.api.QhorusChannel";
             case "eidos" -> "io.casehub.eidos.api.AgentDescriptor";
             default -> moduleName;

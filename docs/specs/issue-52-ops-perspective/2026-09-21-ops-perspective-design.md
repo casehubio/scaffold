@@ -44,11 +44,11 @@ perspective:
 
 ### Perspective loading mechanism
 
-**Schema:** The `perspective.yaml` schema above is the complete top-level structure. Fields: `name` (string, required), `description` (string), `version` (semver string), `modules` (required/optional lists of module identifiers), `views` (tabs array, each with `id`, `label`, `view` referencing a pages DSL view definition), `datasets` (named data sources with `endpoint` and `source` identifying the providing module).
+**Schema:** The `app.yaml` schema above is the complete top-level structure. Fields: `name` (string, required), `description` (string), `version` (semver string), `modules` (required/optional lists of module identifiers), `views` (tabs array, each with `id`, `label`, `view` referencing a pages DSL view definition), `datasets` (named data sources with `endpoint` and `source` identifying the providing module).
 
 **Module activation:** Today, `ModuleRegistryResource` does classpath probing (`probeClass("io.casehub.ops.app.OpsApplication", "ops", detected)`) to discover available modules. Perspectives replace probing with declaration: the perspective YAML lists required and optional modules. At boot, scaffold validates that all required module classes are on the classpath and activates CDI beans via `@DesiredStateQualifier`-style scoping. Optional modules activate only when their probe class is present. This is a build-time composition decision — the scaffold Maven POM declares which module JARs to include, and the perspective YAML declares which of those to activate.
 
-**View rendering:** Scaffold reads `perspective.yaml` at boot. The views section defines the tab layout using the casehub-pages DSL. Each `view` reference maps to a pages DSL definition (either inline in the perspective YAML or in a separate view file). The pages DSL's `hostPanel()` primitive references blocks-ui components by registered panel name. All blocks-ui components are bundled in scaffold's webui build; the perspective references them by name.
+**View rendering:** Scaffold reads `app.yaml` at boot. The views section defines the tab layout using the casehub-pages DSL. Each `view` reference maps to a pages DSL definition (either inline in the perspective YAML or in a separate view file). The pages DSL's `hostPanel()` primitive references blocks-ui components by registered panel name. All blocks-ui components are bundled in scaffold's webui build; the perspective references them by name.
 
 **Dataset wiring:** Each dataset entry declares an endpoint path and the source module that provides it. The ops-app module already exposes REST resources (`ApplicationResource`, `DeploymentResource`, `ReconciliationResource`, `ClusterResource`, `ScalingResource`, `CaseResource`, `ApprovalResource`, `ServiceOperationResource`). The perspective's dataset declarations wire these existing endpoints to frontend data consumers via the pages DSL's data binding mechanism.
 
@@ -60,7 +60,7 @@ perspective:
 | **YAML runner** | Scaffold configured to run a pure-YAML project (case definitions, DesiredState graphs, eidos orgs — all loaded from YAML) | A pure-YAML CaseHub app |
 | **Generic console** | Today's scaffold — classpath detection, conditional tabs | The current #41/#48 console |
 
-The generic console is the "default perspective" — what scaffold does today when no `perspective.yaml` is present.
+The generic console is the "default perspective" — what scaffold does today when no `app.yaml` is present.
 
 ### Component resolution
 
@@ -325,7 +325,7 @@ No Maven. No JDK. No Quarkus configuration. The developer sees their case defini
 
 ## 6. Ops Perspective UI — Tab Structure and Data Flow
 
-The ops perspective's UI is defined in its `perspective.yaml` using the casehub-pages DSL.
+The ops perspective's UI is defined in its `app.yaml` using the casehub-pages DSL.
 
 ### Primary tabs
 
@@ -406,7 +406,7 @@ The following gaps were identified during platform investigation and must be add
 
 | Gap | Current state | Required | Priority | Gated by |
 |-----|--------------|----------|----------|----------|
-| **No perspective concept in scaffold** | Flat module detection, conditional tabs | `perspective.yaml` loading and module activation | High — foundational | — |
+| **No perspective concept in scaffold** | Flat module detection, conditional tabs | `app.yaml` loading and module activation | High — foundational | — |
 | **Podman provisioning module** | No container DesiredState types exist | `ops-container` module with ContainerNodeSpec hierarchy, PodmanActualStateAdapter, PodmanNodeProvisioner | High — required for local dev mode | — |
 | **No pure-YAML consumer project** | Plugin model exists only in test fixtures | At least one reference YAML project. Uses existing engine YAML DSL + `casehub-deployment.yaml` topology declarations for MVP. Full YAML DesiredState graphs require DesiredState C10 (Declaration Surfaces, status: 📋 planned) | High — needed for dev experience story | DesiredState C10 for full experience |
 | **blocks-ui semantic viewers** | Existing diagram components unknown extent | Graph viewer, org chart, channel topology, case structure | High — core of the enhanced YAML experience | — |
@@ -422,7 +422,7 @@ The following gaps were identified during platform investigation and must be add
 
 The smallest useful version. Demonstrates the ops perspective concept end-to-end:
 
-- **Perspective loading** — scaffold reads `perspective.yaml`, activates declared modules, renders the ops UI
+- **Perspective loading** — scaffold reads `app.yaml`, activates declared modules, renders the ops UI
 - **Single deployment** — deploy one Java app (e.g. fsitrading) to a Podman container on the developer's machine
 - **Infrastructure provisioning** — PostgreSQL container provisioned alongside the app, port mapping configured
 - **Health monitoring** — health check polling, health status in Fleet tab

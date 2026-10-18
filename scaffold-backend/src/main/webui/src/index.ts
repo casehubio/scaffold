@@ -1,7 +1,7 @@
 import { loadSite } from "@casehubio/pages-runtime";
 import { page, tabs } from "@casehubio/pages-ui";
 import "@casehubio/pages-ui-tokens";
-import { createDatasets, createPerspectiveDatasets } from "./datasets";
+import { createDatasets, createAppDatasets } from "./datasets";
 import { casesView } from "./views/cases";
 import { workItemsView } from "./views/work-items";
 import { queuesView } from "./views/queues";
@@ -17,7 +17,7 @@ import { healthView } from "./views/health";
 import { driftView } from "./views/drift";
 import { situationsView } from "./views/situations";
 import { updatesView } from "./views/updates";
-import { setupNavigation, configurePerspectiveNavigation } from "./navigation";
+import { setupNavigation, configureAppNavigation } from "./navigation";
 
 type TabEntry = [string, ...unknown[]];
 
@@ -30,22 +30,22 @@ const VIEW_REGISTRY: Record<string, unknown> = {
   "update-manager": updatesView,
 };
 
-interface PerspectiveTab {
+interface AppTab {
   id: string;
   label: string;
   view: string;
 }
 
-interface PerspectiveDatasetDef {
+interface AppDatasetDef {
   name: string;
   endpoint: string;
   source: string;
 }
 
-interface PerspectiveResponse {
+interface AppResponse {
   name: string;
-  tabs: PerspectiveTab[];
-  datasets: PerspectiveDatasetDef[];
+  tabs: AppTab[];
+  datasets: AppDatasetDef[];
 }
 
 function buildDefaultTabs(modules: string[]): TabEntry[] {
@@ -65,22 +65,22 @@ function buildDefaultTabs(modules: string[]): TabEntry[] {
 async function start() {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  const perspectiveResp = await fetch("/api/perspective");
+  const appResp = await fetch("/api/app");
   let allTabs: TabEntry[];
   let datasets;
   let defaultTab: string;
 
-  if (perspectiveResp.ok) {
-    const perspective: PerspectiveResponse = await perspectiveResp.json();
-    allTabs = perspective.tabs
+  if (appResp.ok) {
+    const app: AppResponse = await appResp.json();
+    allTabs = app.tabs
       .map((t) => {
         const view = VIEW_REGISTRY[t.view];
-        if (!view) console.warn(`Perspective tab "${t.label}" references unknown view "${t.view}"`);
+        if (!view) console.warn(`App tab "${t.label}" references unknown view "${t.view}"`);
         return [t.label, view] as TabEntry;
       })
       .filter(([, v]) => v != null);
-    datasets = createPerspectiveDatasets(perspective.datasets);
-    configurePerspectiveNavigation(perspective.tabs);
+    datasets = createAppDatasets(app.datasets);
+    configureAppNavigation(app.tabs);
     defaultTab = allTabs.length > 0 ? (allTabs[0][0] as string) : "Fleet";
   } else {
     const { modules } = await fetch("/api/modules").then(r => r.json());

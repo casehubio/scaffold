@@ -1,15 +1,15 @@
-package io.casehub.flow.perspective;
+package io.casehub.flow.app;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PerspectiveLoaderTest {
+class AppLoaderTest {
 
     @Test
-    void loadsValidPerspectiveYaml() {
+    void loadsValidAppYaml() {
         var yaml = """
-                perspective:
+                app:
                   name: ops
                   description: "CaseHub operations management"
                   version: "1.0"
@@ -29,7 +29,7 @@ class PerspectiveLoaderTest {
                       endpoint: /api/ops/deployments
                       source: ops-app
                 """;
-        var config = PerspectiveLoader.parse(yaml);
+        var config = AppLoader.parse(yaml);
         assertThat(config).isPresent();
         assertThat(config.get().name()).isEqualTo("ops");
         assertThat(config.get().modules().required()).containsExactly("engine", "desiredstate", "ops-deployment", "work");
@@ -44,41 +44,41 @@ class PerspectiveLoaderTest {
     }
 
     @Test
-    void returnsEmptyForMissingPerspectiveKey() {
-        var config = PerspectiveLoader.parse("something: else");
+    void returnsEmptyForMissingAppKey() {
+        var config = AppLoader.parse("something: else");
         assertThat(config).isEmpty();
     }
 
     @Test
     void returnsEmptyForBlankInput() {
-        assertThat(PerspectiveLoader.parse("")).isEmpty();
-        assertThat(PerspectiveLoader.parse(null)).isEmpty();
+        assertThat(AppLoader.parse("")).isEmpty();
+        assertThat(AppLoader.parse(null)).isEmpty();
     }
 
     @Test
     void returnsEmptyForInvalidYaml() {
-        var config = PerspectiveLoader.parse("not: valid: yaml: {{");
+        var config = AppLoader.parse("not: valid: yaml: {{");
         assertThat(config).isEmpty();
     }
 
     @Test
-    void classpathPerspectiveHasAllOpsDatasets() {
-        var config = PerspectiveLoader.loadFromClasspath().orElseThrow();
-        var names = config.datasets().stream().map(PerspectiveDataset::name).toList();
+    void classpathAppHasAllOpsDatasets() {
+        var config = AppLoader.loadFromClasspath().orElseThrow();
+        var names = config.datasets().stream().map(AppDataset::name).toList();
         assertThat(names).containsExactlyInAnyOrder(
-            "applications", "deployments", "clusters", "reconciliation", "cases", "approvals");
+            "applications", "deployments", "clusters", "reconciliation", "cases", "approvals", "topology");
 
-        var endpoints = config.datasets().stream().map(PerspectiveDataset::endpoint).toList();
+        var endpoints = config.datasets().stream().map(AppDataset::endpoint).toList();
         assertThat(endpoints).allMatch(e -> e.startsWith("/api/ops/"));
     }
 
     @Test
-    void handlesMinimalPerspective() {
+    void handlesMinimalApp() {
         var yaml = """
-                perspective:
+                app:
                   name: minimal
                 """;
-        var config = PerspectiveLoader.parse(yaml);
+        var config = AppLoader.parse(yaml);
         assertThat(config).isPresent();
         assertThat(config.get().name()).isEqualTo("minimal");
         assertThat(config.get().modules().required()).isEmpty();
@@ -86,4 +86,38 @@ class PerspectiveLoaderTest {
         assertThat(config.get().tabs()).isEmpty();
         assertThat(config.get().datasets()).isEmpty();
     }
+
+    @Test
+    void parsesConnectionsSection() {
+        var yaml = """
+                   app:
+                     name: ops
+                     connections:
+                       reconciliation-events:
+                         endpoint: /api/ops/reconciliation/events
+                         type: sse
+                         source: reconciliation-service
+                   """;
+        var config = AppLoader.parse(yaml);
+        assertThat(config).isPresent();
+        assertThat(config.get().connections()).hasSize(1);
+        var conn = config.get().connections().get(0);
+        assertThat(conn.name()).isEqualTo("reconciliation-events");
+        assertThat(conn.endpoint()).isEqualTo("/api/ops/reconciliation/events");
+        assertThat(conn.type()).isEqualTo("sse");
+        assertThat(conn.source()).isEqualTo("reconciliation-service");
+    }
+
+    @Test
+    void emptyConnectionsWhenSectionMissing() {
+        var yaml = """
+                   app:
+                     name: minimal
+                   """;
+        var config = AppLoader.parse(yaml);
+        assertThat(config).isPresent();
+        assertThat(config.get().connections()).isEmpty();
+    }
+
+
 }
