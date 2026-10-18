@@ -1,11 +1,11 @@
-perspective:
+app:
   name: ops
   description: "CaseHub operations management"
   version: "1.0"
 
   modules:
     required: [engine, desiredstate, work]
-    optional: [ops-deployment, ops-compliance]
+    optional: [ops-service, ops-deployment, ops-compliance]
 
   views:
     tabs:
@@ -24,6 +24,9 @@ perspective:
       - id: situations
         label: "Situations"
         view: situation-manager
+      - id: topology
+        label: "Topology"
+        view: topology-graph
       - id: updates
         label: "Updates"
         view: update-manager
@@ -44,6 +47,15 @@ perspective:
     cases:
       endpoint: /api/ops/cases
       source: ops-service
+    topology:
+      endpoint: /api/ops/topology
+      source: topology-service
     approvals:
       endpoint: /api/ops/approvals
       source: ops-service
+
+  connections:
+    reconciliation-events:
+      endpoint: /api/ops/reconciliation/events
+      type: sse
+      source: reconciliation-service

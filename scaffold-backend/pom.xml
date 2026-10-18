@@ -149,12 +149,12 @@
         <dependency>
             <groupId>io.casehub</groupId>
             <artifactId>casehub-pages-npm</artifactId>
-            <version>${casehub.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.casehub</groupId>
             <artifactId>casehub-blocks-ui-npm</artifactId>
-            <version>${casehub.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

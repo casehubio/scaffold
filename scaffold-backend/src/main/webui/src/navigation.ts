@@ -33,10 +33,10 @@ const DEFAULT_SLUG_TO_LABEL: Record<string, string> = {
 let activeTabTopics: Record<string, string> = DEFAULT_TAB_TOPICS;
 let activeSlugToLabel: Record<string, string> = DEFAULT_SLUG_TO_LABEL;
 
-export function configurePerspectiveNavigation(perspectiveTabs: Array<{ id: string; label: string }>) {
+export function configureAppNavigation(appTabs: Array<{ id: string; label: string }>) {
   const topics: Record<string, string> = {};
   const slugs: Record<string, string> = {};
-  for (const tab of perspectiveTabs) {
+  for (const tab of appTabs) {
     topics[tab.id] = tab.id;
     slugs[tab.id] = tab.label;
   }
