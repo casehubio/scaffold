@@ -94,6 +94,23 @@ https://raw.githubusercontent.com/casehubio/parent/main/docs/PLATFORM.md
 
 ---
 
+## Build Dependencies
+
+To build scaffold locally with all dependencies:
+
+```bash
+mvn --batch-mode install -f ../platform/pom.xml -DskipTests
+mvn --batch-mode install -f ../engine/pom.xml -DskipTests
+mvn --batch-mode install -f ../work/pom.xml -DskipTests
+mvn --batch-mode install -f ../ledger/pom.xml -DskipTests
+mvn --batch-mode install -f ../ops/pom.xml -DskipTests
+mvn --batch-mode install
+```
+
+**Podman prerequisite:** Dev services require Podman running. Start with `podman machine start`.
+
+---
+
 ## Ecosystem Conventions
 
 All casehubio projects align on these conventions:
