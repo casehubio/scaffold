@@ -2,6 +2,7 @@ import { loadSite } from "@casehubio/pages-runtime";
 import { page, tabs } from "@casehubio/pages-ui";
 import "@casehubio/pages-ui-tokens";
 import { createDatasets, createAppDatasets } from "./datasets";
+import { connectToReconciliationEvents } from "./events";
 import { casesView } from "./views/cases";
 import { workItemsView } from "./views/work-items";
 import { queuesView } from "./views/queues";
@@ -99,6 +100,7 @@ async function start() {
     const site = await loadSite(container, app);
     site.setTheme(prefersDark ? "dark" : "light");
     setupNavigation(site, container);
+    connectToReconciliationEvents(container);
 
     if (!location.hash) {
       site.navigate(defaultTab);
