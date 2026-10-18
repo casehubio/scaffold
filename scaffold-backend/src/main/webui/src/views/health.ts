@@ -4,9 +4,10 @@ import { lookup, col, groupBy } from "@casehubio/pages-ui";
 export const healthView = rows(
   title("Health", "h2"),
   dataTable({
-    lookup: lookup("clusters", groupBy(null,
-      col("id"), col("name"), col("status"),
-      col("nodeCount"),
+    lookup: lookup("topology", groupBy(null,
+      col("nodeId", "Node"),
+      col("type", "Type"),
+      col("status", "Status"),
     )),
     sortable: true,
   }),

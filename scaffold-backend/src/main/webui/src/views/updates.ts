@@ -5,8 +5,9 @@ export const updatesView = rows(
   title("Updates", "h2"),
   dataTable({
     lookup: lookup("deployments", groupBy(null,
-      col("applicationId"), col("version"),
-      col("status"), col("timestamp"),
+      col("deploymentId", "ID"),
+      col("status", "Status"),
+      col("message", "Message"),
     )),
     sortable: true,
   }),
