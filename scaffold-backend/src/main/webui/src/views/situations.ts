@@ -5,7 +5,10 @@ export const situationsView = rows(
   title("Situations", "h2"),
   dataTable({
     lookup: lookup("cases", groupBy(null,
-      col("caseId"), col("eventCount"),
+      col("caseId", "Case"),
+      col("type", "Type"),
+      col("status", "Status"),
+      col("eventCount", "Events"),
     )),
     sortable: true,
   }),

@@ -4,11 +4,13 @@ import { lookup, col, groupBy } from "@casehubio/pages-ui";
 export const fleetView = rows(
   title("Fleet", "h2"),
   dataTable({
-    lookup: lookup("applications", groupBy(null,
-      col("id"), col("name"), col("status"),
-      col("version"), col("lastDeployed"),
+    lookup: lookup("topology", groupBy(null,
+      col("nodeId", "Node"),
+      col("type", "Type"),
+      col("status", "Status"),
+      col("loopId", "Reconciliation Loop"),
     )),
     sortable: true,
-    selectionTopic: "selected-deployment",
+    selectionTopic: "selected-node",
   }),
 );

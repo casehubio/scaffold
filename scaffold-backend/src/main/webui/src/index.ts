@@ -18,6 +18,7 @@ import { healthView } from "./views/health";
 import { driftView } from "./views/drift";
 import { situationsView } from "./views/situations";
 import { updatesView } from "./views/updates";
+import { topologyView } from "./views/topology";
 import { setupNavigation, configureAppNavigation } from "./navigation";
 
 type TabEntry = [string, ...unknown[]];
@@ -28,6 +29,7 @@ const VIEW_REGISTRY: Record<string, unknown> = {
   "health-monitor": healthView,
   "drift-detection": driftView,
   "situation-manager": situationsView,
+  "topology-graph": topologyView,
   "update-manager": updatesView,
 };
 
