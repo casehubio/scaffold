@@ -267,7 +267,7 @@ class AclIntegrationTest {
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
   void testReadDefinitionWithJwt() {
-    grant(JWT_ACTOR, DEF_RESOURCE, AclAction.READ);
+    grant(JWT_ACTOR, DEF_RESOURCE + "/" + DEF_VERSION, AclAction.READ);
 
     given()
             .when()
@@ -282,7 +282,7 @@ class AclIntegrationTest {
   @TestSecurity(user = JWT_ACTOR, roles = {"user"})
   @OidcSecurity(claims = @Claim(key = "tenancyId", value = "test-tenant"))
   void testReadDefinitionByVersionWithJwt() {
-    grant(JWT_ACTOR, DEF_RESOURCE, AclAction.READ);
+    grant(JWT_ACTOR, DEF_RESOURCE + "/" + DEF_VERSION, AclAction.READ);
 
     given()
         .when()
