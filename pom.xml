@@ -14,6 +14,8 @@
     </modules>
 
     <properties>
+        <casehub.version>0.4-SNAPSHOT</casehub.version>
+        <version.blocks-ui>0.3-SNAPSHOT</version.blocks-ui>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
