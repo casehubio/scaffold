@@ -12,9 +12,8 @@ import java.util.List;
 @Alternative
 @Priority(100)
 public class EmbeddedTopologyService implements TopologyService {
-
     @Override
-    public TopologySnapshot getSnapshot() {
+    public TopologySnapshot getSnapshot(String tenancyId) {
         return new TopologySnapshot(List.of());
     }
 }

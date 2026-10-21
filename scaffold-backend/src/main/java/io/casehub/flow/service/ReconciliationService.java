@@ -1,8 +1,9 @@
 package io.casehub.flow.service;
 
-import java.util.List;
+import java.util.UUID;
 
 public interface ReconciliationService {
-    List<ReconciliationLoopStatus> activeLoops();
-    DriftReport getDrift(String loopId);
+    ReconciliationStatus getStatus(UUID applicationId);
+
+    void triggerReconciliation(UUID applicationId);
 }

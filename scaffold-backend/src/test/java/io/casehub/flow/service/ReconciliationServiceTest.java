@@ -3,30 +3,34 @@ package io.casehub.flow.service;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ReconciliationServiceTest {
 
     @Test
-    void activeLoopsEmptyWhenNoneRunning() {
+    void statusHasEmptyClustersWhenNoneActive() {
         ReconciliationService service = new StubReconciliationService();
-        assertThat(service.activeLoops()).isEmpty();
+        var status = service.getStatus(UUID.randomUUID());
+        assertThat(status.clusters()).isEmpty();
     }
 
     @Test
-    void driftReportHasEmptyEntriesForUnknownLoop() {
-        ReconciliationService service = new StubReconciliationService();
-        var report = service.getDrift("unknown-loop");
-        assertThat(report.loopId()).isEqualTo("unknown-loop");
-        assertThat(report.entries()).isEmpty();
+    void clusterStatusCarriesAllFields() {
+        var cluster = new ClusterStatus("c-1", "prod-cluster", true, 5);
+        assertThat(cluster.clusterId()).isEqualTo("c-1");
+        assertThat(cluster.clusterName()).isEqualTo("prod-cluster");
+        assertThat(cluster.active()).isTrue();
+        assertThat(cluster.nodeCount()).isEqualTo(5);
     }
 
     static class StubReconciliationService implements ReconciliationService {
         @Override
-        public List<ReconciliationLoopStatus> activeLoops() { return List.of(); }
-
+        public ReconciliationStatus getStatus(UUID applicationId) {
+            return new ReconciliationStatus(List.of());
+        }
         @Override
-        public DriftReport getDrift(String loopId) { return new DriftReport(loopId, List.of()); }
+        public void triggerReconciliation(UUID applicationId) {}
     }
 }

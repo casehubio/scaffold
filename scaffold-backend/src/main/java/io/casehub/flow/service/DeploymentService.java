@@ -1,10 +1,14 @@
 package io.casehub.flow.service;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DeploymentService {
-    List<TopologyDefinition> availableDefinitions();
-    List<DeploymentTarget> availableTargets();
-    DeploymentStatus deploy(String definitionId, String targetId);
-    DeploymentStatus status(String deploymentId);
+    List<DeploymentRecord> listDeployments(UUID applicationId);
+
+    DeploymentRecord getCurrentDeployment(UUID applicationId);
+
+    void deploy(UUID applicationId);
+
+    void rollback(UUID applicationId);
 }

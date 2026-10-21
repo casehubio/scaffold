@@ -10,9 +10,8 @@ import java.util.List;
 @ApplicationScoped
 @DefaultBean
 public class ClientTopologyService implements TopologyService {
-
     @Override
-    public TopologySnapshot getSnapshot() {
+    public TopologySnapshot getSnapshot(String tenancyId) {
         return new TopologySnapshot(List.of());
     }
 }
