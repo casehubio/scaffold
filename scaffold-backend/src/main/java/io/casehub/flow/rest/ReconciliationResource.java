@@ -10,6 +10,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import io.smallrye.common.annotation.RunOnVirtualThread;
 import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Path("/api/scaffold/reconciliation")
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
+@RunOnVirtualThread
 public class ReconciliationResource {
 
     @Inject

@@ -5,9 +5,9 @@ export const driftView = rows(
   title("Drift", "h2"),
   dataTable({
     lookup: lookup("reconciliation", groupBy(null,
-      col("loopId", "Loop"),
-      col("tenancyId", "Tenancy"),
-      col("state", "State"),
+      col("clusterId", "Cluster"),
+      col("clusterName", "Name"),
+      col("active", "Active"),
       col("nodeCount", "Nodes"),
     )),
     sortable: true,

@@ -74,10 +74,13 @@ deployment:
    REST/GraphQL endpoints
 
 Current service interfaces:
-- `TopologyService` — `getSnapshot()` returns `TopologySnapshot`
-- `DeploymentService` — `availableDefinitions()`, `availableTargets()`,
-  `deploy()`, `status()`
-- `ReconciliationService` — `activeLoops()`, `getDrift(loopId)`
+- `TopologyService` — `getSnapshot(tenancyId)` returns flat
+  `TopologySnapshot(List<TopologyNode>)` with joined actual statuses
+- `DeploymentService` — `listDeployments(applicationId)`,
+  `getCurrentDeployment(applicationId)`, `deploy(applicationId)`,
+  `rollback(applicationId)`
+- `ReconciliationService` — `getStatus(applicationId)`,
+  `triggerReconciliation(applicationId)`
 
 ## Frontend View Registration
 

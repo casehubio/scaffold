@@ -6,9 +6,9 @@ export const fleetView = rows(
   dataTable({
     lookup: lookup("topology", groupBy(null,
       col("nodeId", "Node"),
-      col("type", "Type"),
-      col("status", "Status"),
-      col("loopId", "Reconciliation Loop"),
+      col("nodeType", "Type"),
+      col("actualStatus", "Status"),
+      col("loopKey", "Reconciliation Loop"),
     )),
     sortable: true,
     selectionTopic: "selected-node",
