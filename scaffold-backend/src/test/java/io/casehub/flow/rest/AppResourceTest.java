@@ -59,7 +59,7 @@ class AppResourceTest {
             .containsExactlyInAnyOrder("applications", "deployments", "clusters",
                 "reconciliation", "cases", "approvals", "topology");
         assertThat(entity.datasets().stream().map(AppDataset::endpoint).toList())
-            .allMatch(e -> e.startsWith("/api/ops/"));
+            .allMatch(e -> e.startsWith("/api/ops/") || e.startsWith("/api/scaffold/"));
     }
 
     static class StubProducer extends AppProducer {

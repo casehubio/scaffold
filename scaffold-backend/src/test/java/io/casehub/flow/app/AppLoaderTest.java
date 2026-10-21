@@ -69,7 +69,7 @@ class AppLoaderTest {
             "applications", "deployments", "clusters", "reconciliation", "cases", "approvals", "topology");
 
         var endpoints = config.datasets().stream().map(AppDataset::endpoint).toList();
-        assertThat(endpoints).allMatch(e -> e.startsWith("/api/ops/"));
+        assertThat(endpoints).allMatch(e -> e.startsWith("/api/ops/") || e.startsWith("/api/scaffold/"));
     }
 
     @Test

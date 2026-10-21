@@ -48,7 +48,7 @@ app:
       endpoint: /api/ops/cases
       source: ops-service
     topology:
-      endpoint: /api/ops/topology
+      endpoint: /api/scaffold/topology
       source: topology-service
     approvals:
       endpoint: /api/ops/approvals
