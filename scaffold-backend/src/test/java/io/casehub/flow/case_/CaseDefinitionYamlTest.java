@@ -19,15 +19,16 @@ class CaseDefinitionYamlTest {
         "incident-response,   scaffold, incident-response,    1.0.0",
     })
     void yamlDefinitionParsesCorrectly(String file, String namespace, String name, String version) throws Exception {
-        InputStream is = getClass().getClassLoader()
-                .getResourceAsStream("casehub/ops/" + file + ".yaml");
-        assertThat(is).as("YAML file casehub/ops/%s.yaml not found on classpath", file).isNotNull();
+        try (InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("casehub/ops/" + file + ".yaml")) {
+            assertThat(is).as("YAML file casehub/ops/%s.yaml not found on classpath", file).isNotNull();
 
-        var definition = CaseDefinitionYamlMapper.load(is);
+            var definition = CaseDefinitionYamlMapper.load(is);
 
-        assertThat(definition.getNamespace()).isEqualTo(namespace);
-        assertThat(definition.getName()).isEqualTo(name);
-        assertThat(definition.getVersion()).isEqualTo(version);
-        assertThat(definition.getBindings()).isNotEmpty();
+            assertThat(definition.getNamespace()).isEqualTo(namespace);
+            assertThat(definition.getName()).isEqualTo(name);
+            assertThat(definition.getVersion()).isEqualTo(version);
+            assertThat(definition.getBindings()).isNotEmpty();
+        }
     }
 }
