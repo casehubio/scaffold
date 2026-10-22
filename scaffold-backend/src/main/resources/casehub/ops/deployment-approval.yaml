@@ -1,0 +1,40 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: deployment-approval
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-deployments"
+    features:
+      risk: ".riskClassification.level"
+      nodeType: ".nodeType"
+      action: ".action"
+      namespace: ".namespace"
+
+  bindings:
+    - name: delegate-to-ops
+      on:
+        contextChange:
+          filter: '.approvalSpec != null and .approvalResult == null'
+      subCase:
+        namespace: ops
+        name: deployment-approval
+        version: "1.0"
+        inputMapping: '.approvalSpec'
+        outputMapping: '{ approvalResult: { decision: .approvalDecision, record: .decisionRecord } }'
+        waitForCompletion: true
+
+  goals:
+    - name: approval-decided
+      condition: '.approvalResult.decision != null'
+      kind: success
+    - name: approval-faulted
+      condition: '.approvalResult != null and .approvalResult.decision == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [approval-decided]
+    failure:
+      anyOf: [approval-faulted]

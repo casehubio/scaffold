@@ -1,0 +1,86 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: change-management
+version: "1.0.0"
+
+spec:
+  capabilities:
+    - name: pre-deploy-compliance
+    - name: deploy-approval
+    - name: post-deploy-monitor
+
+  workers:
+    - name: compliance-checker
+      capabilities: [pre-deploy-compliance]
+    - name: approval-handler
+      capabilities: [deploy-approval]
+      sequence: [compliance-checker]
+    - name: drift-monitor
+      capabilities: [post-deploy-monitor]
+      sequence: [approval-handler]
+
+  bindings:
+    - name: compliance-check
+      capability: pre-deploy-compliance
+      on:
+        contextChange:
+          filter: '.changeSpec != null and .complianceResult == null'
+      subCase:
+        namespace: ops
+        name: compliance-remediation
+        version: "1.0"
+        inputMapping: '.changeSpec.complianceSpec'
+        outputMapping: '{ complianceResult: { status: .complianceStatus, assessment: .complianceAssessment } }'
+        waitForCompletion: true
+
+    - name: approval-gate
+      capability: deploy-approval
+      on:
+        contextChange:
+          filter: '.complianceResult != null and .approvalResult == null'
+      when: '.complianceResult.status == "resolved"'
+      subCase:
+        namespace: ops
+        name: deployment-approval
+        version: "1.0"
+        inputMapping: '.changeSpec.deploymentSpec'
+        outputMapping: '{ approvalResult: { decision: .approvalDecision, record: .decisionRecord } }'
+        waitForCompletion: true
+
+    - name: drift-watch
+      capability: post-deploy-monitor
+      on:
+        contextChange:
+          filter: '.approvalResult != null and .monitoringResult == null'
+      when: '.approvalResult.decision == "approved"'
+      subCase:
+        namespace: ops
+        name: drift-remediation
+        version: "1.0"
+        inputMapping: '{ driftSpec: { applicationId: .changeSpec.applicationId } }'
+        outputMapping: '{ monitoringResult: .remediationStatus }'
+        waitForCompletion: false
+
+  goals:
+    - name: change-deployed
+      condition: '.approvalResult.decision == "approved"'
+      kind: success
+    - name: change-rejected
+      condition: '.approvalResult.decision == "rejected" or .complianceResult.status == "escalated"'
+      kind: failure
+    - name: change-faulted
+      condition: '(.complianceResult != null and .complianceResult.status == null) or (.approvalResult != null and .approvalResult.decision == null)'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [change-deployed]
+    failure:
+      anyOf: [change-rejected, change-faulted]
+
+  cbr:
+    domain: "ops-changes"
+    features:
+      changeType: ".changeSpec.type"
+      namespace: ".changeSpec.namespace"
+      riskLevel: ".riskClassification.level"

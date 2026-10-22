@@ -1,0 +1,39 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: drift-remediation
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-drift"
+    features:
+      severity: ".driftClassification.severity"
+      nodeCount: ".driftDetails | length"
+      securitySensitive: '.driftDetails | any(.fields[]?; .fieldName | IN("image","serviceAccount","rbac","secrets"))'
+
+  bindings:
+    - name: delegate-to-ops
+      on:
+        contextChange:
+          filter: '.driftSpec != null and .remediationResult == null'
+      subCase:
+        namespace: ops
+        name: drift-remediation
+        version: "1.0"
+        inputMapping: '.driftSpec'
+        outputMapping: '{ remediationResult: { status: .remediationStatus, classification: .driftClassification } }'
+        waitForCompletion: true
+
+  goals:
+    - name: remediation-complete
+      condition: '.remediationResult.status != null'
+      kind: success
+    - name: remediation-faulted
+      condition: '.remediationResult != null and .remediationResult.status == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [remediation-complete]
+    failure:
+      anyOf: [remediation-faulted]

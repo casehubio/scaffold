@@ -1,0 +1,43 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: compliance-audit
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-compliance"
+    features:
+      controlType: ".controlType"
+      outcome: ".outcome"
+      frameworks: ".frameworks[0]"
+
+  milestones:
+    - name: audit-result-received
+      condition: '.auditResult != null'
+
+  bindings:
+    - name: delegate-to-ops
+      on:
+        contextChange:
+          filter: '.violationData != null and .auditResult == null'
+      subCase:
+        namespace: ops
+        name: compliance-remediation
+        version: "1.0"
+        inputMapping: '.violationData'
+        outputMapping: '{ auditResult: { status: .complianceStatus, assessment: .complianceAssessment } }'
+        waitForCompletion: true
+
+  goals:
+    - name: audit-complete
+      condition: '.auditResult.status != null'
+      kind: success
+    - name: audit-faulted
+      condition: '.auditResult != null and .auditResult.status == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [audit-complete]
+    failure:
+      anyOf: [audit-faulted]

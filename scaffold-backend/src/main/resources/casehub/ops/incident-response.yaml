@@ -1,0 +1,75 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: incident-response
+version: "1.0.0"
+
+spec:
+  milestones:
+    - name: triaged
+      condition: '.triageResult != null'
+      slaDuration: PT15M
+      slaStartFrom: CASE_CREATED
+    - name: resolved
+      condition: '.triageResult.status == "resolved" or .triageResult.status == "escalated"'
+
+  bindings:
+    - name: on-incident-data
+      on:
+        contextChange:
+          filter: '.incidentData != null and .triageResult == null'
+      subCase:
+        namespace: ops
+        name: incident-response
+        version: "1.0"
+        inputMapping: '.incidentData'
+        outputMapping: '{ triageResult: { assessment: .incidentAssessment, status: .incidentStatus } }'
+        waitForCompletion: true
+
+    - name: on-drift-during-incident
+      on:
+        contextChange:
+          filter: '.incidentDrift != null and .driftResult == null'
+      subCase:
+        namespace: ops
+        name: drift-remediation
+        version: "1.0"
+        inputMapping: '.incidentDrift'
+        outputMapping: '{ driftResult: { status: .remediationStatus, classification: .driftClassification } }'
+        waitForCompletion: true
+
+    - name: on-cve-during-incident
+      on:
+        contextChange:
+          filter: '.incidentCve != null and .cveResult == null'
+      subCase:
+        namespace: ops
+        name: cve-response
+        version: "1.0"
+        inputMapping: '.incidentCve'
+        outputMapping: '{ cveResult: { status: .cveStatus, assessment: .cveAssessment } }'
+        waitForCompletion: true
+
+  goals:
+    - name: incident-resolved
+      condition: '.triageResult.status == "resolved"'
+      kind: success
+    - name: incident-escalated
+      condition: '.triageResult.status == "escalated"'
+      kind: failure
+    - name: incident-faulted
+      condition: '.triageResult != null and .triageResult.status == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [incident-resolved]
+    failure:
+      anyOf: [incident-escalated, incident-faulted]
+
+  cbr:
+    domain: "ops-incidents"
+    crossType: true
+    features:
+      severity: ".incidentData.severity"
+      category: ".incidentData.category"
+      affectedService: ".incidentData.serviceId"
