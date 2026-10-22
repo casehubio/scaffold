@@ -66,7 +66,8 @@ class AppLoaderTest {
         var config = AppLoader.loadFromClasspath().orElseThrow();
         var names = config.datasets().stream().map(AppDataset::name).toList();
         assertThat(names).containsExactlyInAnyOrder(
-            "applications", "deployments", "clusters", "reconciliation", "cases", "approvals", "topology");
+            "applications", "deployments", "clusters", "reconciliation", "cases", "approvals", "topology",
+            "scaffold-cases", "scaffold-approvals");
 
         var endpoints = config.datasets().stream().map(AppDataset::endpoint).toList();
         assertThat(endpoints).allMatch(e -> e.startsWith("/api/ops/") || e.startsWith("/api/scaffold/"));

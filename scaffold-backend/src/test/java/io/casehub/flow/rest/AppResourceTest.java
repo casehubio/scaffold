@@ -51,13 +51,14 @@ class AppResourceTest {
         var response = resource.getApp();
         assertThat(response.getStatus()).isEqualTo(200);
         var entity = (AppConfig) response.getEntity();
-        assertThat(entity.tabs()).hasSize(7);
+        assertThat(entity.tabs()).hasSize(8);
         assertThat(entity.tabs().stream().map(AppTab::id).toList())
-            .containsExactly("fleet", "deploy", "health", "drift", "situations", "topology", "updates");
-        assertThat(entity.datasets()).hasSize(7);
+            .containsExactly("fleet", "deploy", "health", "drift", "situations", "topology", "updates", "cases");
+        assertThat(entity.datasets()).hasSize(9);
         assertThat(entity.datasets().stream().map(AppDataset::name).toList())
             .containsExactlyInAnyOrder("applications", "deployments", "clusters",
-                "reconciliation", "cases", "approvals", "topology");
+                "reconciliation", "cases", "approvals", "topology",
+                "scaffold-cases", "scaffold-approvals");
         assertThat(entity.datasets().stream().map(AppDataset::endpoint).toList())
             .allMatch(e -> e.startsWith("/api/ops/") || e.startsWith("/api/scaffold/"));
     }

@@ -30,6 +30,9 @@ app:
       - id: updates
         label: "Updates"
         view: update-manager
+      - id: cases
+        label: "Cases"
+        view: cases-dashboard
 
   datasets:
     applications:
@@ -53,6 +56,12 @@ app:
     approvals:
       endpoint: /api/ops/approvals
       source: ops-service
+    scaffold-cases:
+      endpoint: /api/scaffold/cases
+      source: case-service
+    scaffold-approvals:
+      endpoint: /api/scaffold/approvals
+      source: approval-service
 
   connections:
     reconciliation-events:

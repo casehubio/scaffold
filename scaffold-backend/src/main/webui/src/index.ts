@@ -31,6 +31,7 @@ const VIEW_REGISTRY: Record<string, unknown> = {
   "situation-manager": situationsView,
   "topology-graph": topologyView,
   "update-manager": updatesView,
+  "cases-dashboard": casesView,
 };
 
 interface AppTab {

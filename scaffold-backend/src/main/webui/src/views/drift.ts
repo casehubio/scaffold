@@ -9,6 +9,7 @@ export const driftView = rows(
       col("clusterName", "Name"),
       col("active", "Active"),
       col("nodeCount", "Nodes"),
+      col("caseStatus", "Case"),
     )),
     sortable: true,
   }),

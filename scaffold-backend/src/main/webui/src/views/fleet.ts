@@ -9,6 +9,7 @@ export const fleetView = rows(
       col("nodeType", "Type"),
       col("actualStatus", "Status"),
       col("loopKey", "Reconciliation Loop"),
+      col("caseStatus", "Case"),
     )),
     sortable: true,
     selectionTopic: "selected-node",

@@ -11,6 +11,7 @@ export const deployView = rows(
           col("deploymentId", "ID"),
           col("status", "Status"),
           col("message", "Message"),
+          col("caseStatus", "Case"),
         )),
         sortable: true,
       }),

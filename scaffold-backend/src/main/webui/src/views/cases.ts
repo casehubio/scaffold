@@ -1,11 +1,16 @@
-import { rows, columns, dataTable, title } from "@casehubio/pages-ui";
+import { rows, dataTable, title } from "@casehubio/pages-ui";
 import { lookup, col, groupBy } from "@casehubio/pages-ui";
 
 export const casesView = rows(
+  title("Cases", "h2"),
   dataTable({
-    lookup: lookup("cases", groupBy(null,
-      col("caseId"), col("name"), col("status"),
-      col("namespace"), col("version"), col("createdAt"),
+    lookup: lookup("scaffold-cases", groupBy(null,
+      col("caseType", "Case Type"),
+      col("status", "Status"),
+      col("applicationId", "Application"),
+      col("createdAt", "Created"),
+      col("escalationState", "Escalation"),
+      col("subCaseCount", "Sub-cases"),
     )),
     sortable: true,
     filter: { enabled: true },
