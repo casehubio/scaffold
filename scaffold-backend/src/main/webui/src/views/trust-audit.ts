@@ -1,10 +1,10 @@
 import { columns, rows, dataTable, hostPanel } from "@casehubio/pages-ui";
 import { lookup, col, groupBy } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-trust-workbench";
-import "@casehubio/blocks-ui-audit-trail-viewer";
-import "@casehubio/blocks-ui-compliance-summary";
-import "@casehubio/blocks-ui-routing-rationale";
+import "@casehubio/mosaic-trust-workbench";
+import "@casehubio/mosaic-audit-trail-viewer";
+import "@casehubio/mosaic-compliance-summary";
+import "@casehubio/mosaic-routing-rationale";
 
 registerPanel("trust-workbench", "blocks-trust-workbench");
 registerPanel("audit-trail-viewer", "blocks-audit-trail-viewer");

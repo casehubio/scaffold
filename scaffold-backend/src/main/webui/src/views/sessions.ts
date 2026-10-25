@@ -1,6 +1,6 @@
 import { hostPanel } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-session-workbench";
+import "@casehubio/mosaic-session-workbench";
 
 registerPanel("session-workbench", "blocks-session-workbench");
 

@@ -1,7 +1,7 @@
 import { rows, dataTable, hostPanel } from "@casehubio/pages-ui";
 import { lookup, col, groupBy } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-orchestration-workbench";
+import "@casehubio/mosaic-orchestration-workbench";
 
 registerPanel("orchestration-workbench", "blocks-orchestration-workbench");
 

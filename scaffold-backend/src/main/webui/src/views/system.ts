@@ -1,7 +1,7 @@
 import { tabs, hostPanel, rows, dataTable, lookup, col, groupBy } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-preferences-editor";
-import "@casehubio/blocks-ui-kpi-metric-row";
+import "@casehubio/mosaic-preferences-editor";
+import "@casehubio/mosaic-kpi-metric-row";
 
 registerPanel("preferences-editor", "blocks-preferences-editor");
 

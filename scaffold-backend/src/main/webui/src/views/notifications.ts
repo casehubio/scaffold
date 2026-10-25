@@ -1,6 +1,6 @@
 import { tabs, hostPanel } from "@casehubio/pages-ui";
 import { registerPanel } from "@casehubio/pages-runtime";
-import "@casehubio/blocks-ui-notification-inbox";
+import "@casehubio/mosaic-notification-inbox";
 
 registerPanel("notification-inbox", "blocks-notification-inbox");
 registerPanel("notification-preferences", "blocks-notification-preferences");
