@@ -1,0 +1,39 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: scaling-event
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-scaling"
+    features:
+      serviceId: ".serviceId"
+      action: ".scalingDecision.action"
+      targetReplicas: ".scalingDecision.validatedTarget"
+
+  bindings:
+    - name: delegate-to-ops
+      on:
+        contextChange:
+          filter: '.scalingSpec != null and .scalingResult == null'
+      subCase:
+        namespace: ops
+        name: scaling-event
+        version: "1.0"
+        inputMapping: '.scalingSpec'
+        outputMapping: '{ scalingResult: { status: .scalingStatus } }'
+        waitForCompletion: true
+
+  goals:
+    - name: scaling-converged
+      condition: '.scalingResult.status == "converged" or .scalingResult.status == "no-change-needed"'
+      kind: success
+    - name: scaling-faulted
+      condition: '.scalingResult != null and .scalingResult.status == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [scaling-converged]
+    failure:
+      anyOf: [scaling-faulted]

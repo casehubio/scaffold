@@ -16,7 +16,10 @@ class CaseDefinitionYamlTest {
         "drift-remediation,   scaffold, drift-remediation,   1.0.0",
         "compliance-audit,    scaffold, compliance-audit,     1.0.0",
         "change-management,   scaffold, change-management,    1.0.0",
-        "incident-response,   scaffold, incident-response,    1.0.0",
+        "incident-response,       scaffold, incident-response,       1.0.0",
+        "application-lifecycle,   scaffold, application-lifecycle,   1.0.0",
+        "scaling-event,           scaffold, scaling-event,           1.0.0",
+        "service-upgrade,         scaffold, service-upgrade,         1.0.0",
     })
     void yamlDefinitionParsesCorrectly(String file, String namespace, String name, String version) throws Exception {
         try (InputStream is = getClass().getClassLoader()

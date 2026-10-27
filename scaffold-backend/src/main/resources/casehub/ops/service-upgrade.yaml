@@ -1,0 +1,47 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: service-upgrade
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-upgrades"
+    features:
+      serviceId: ".upgradeSpec.serviceId"
+      newImage: ".upgradeSpec.newImage"
+
+  milestones:
+    - name: upgrade-assessed
+      condition: '.upgradeAssessment != null'
+    - name: upgrade-completed
+      condition: '.upgradeResult.status == "completed"'
+
+  bindings:
+    - name: delegate-to-ops
+      on:
+        contextChange:
+          filter: '.upgradeSpec != null and .upgradeResult == null'
+      subCase:
+        namespace: ops
+        name: service-upgrade
+        version: "1.0"
+        inputMapping: '.upgradeSpec'
+        outputMapping: '{ upgradeResult: { status: .upgradeStatus, escalation: .upgradeEscalation } }'
+        waitForCompletion: true
+
+  goals:
+    - name: upgrade-complete
+      condition: '.upgradeResult.status == "completed"'
+      kind: success
+    - name: upgrade-escalated
+      condition: '.upgradeResult.status == "escalated"'
+      kind: failure
+    - name: upgrade-faulted
+      condition: '.upgradeResult != null and .upgradeResult.status == null'
+      kind: failure
+
+  completion:
+    success:
+      allOf: [upgrade-complete]
+    failure:
+      anyOf: [upgrade-escalated, upgrade-faulted]

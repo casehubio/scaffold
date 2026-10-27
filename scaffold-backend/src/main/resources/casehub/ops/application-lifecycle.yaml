@@ -1,0 +1,97 @@
+dsl: "1.0.0"
+namespace: scaffold
+name: application-lifecycle
+version: "1.0.0"
+
+spec:
+  cbr:
+    domain: "ops-applications"
+    crossType: true
+    features:
+      applicationId: ".applicationId"
+      eventType: ".eventType"
+
+  bindings:
+    - name: on-drift-detected
+      on:
+        contextChange:
+          filter: '.driftDetected != null and .driftResult == null'
+      subCase:
+        namespace: ops
+        name: drift-remediation
+        version: "1.0"
+        inputMapping: '.driftDetected'
+        outputMapping: '{ driftResult: { status: .remediationStatus, classification: .driftClassification } }'
+        waitForCompletion: false
+
+    - name: on-cve-detected
+      on:
+        contextChange:
+          filter: '.cveDetected != null and .cveResult == null'
+      subCase:
+        namespace: ops
+        name: cve-response
+        version: "1.0"
+        inputMapping: '.cveData'
+        outputMapping: '{ cveResult: { status: .cveStatus, assessment: .cveAssessment } }'
+        waitForCompletion: false
+
+    - name: on-upgrade-requested
+      on:
+        contextChange:
+          filter: '.upgradeRequested != null and .upgradeResult == null'
+      subCase:
+        namespace: ops
+        name: service-upgrade
+        version: "1.0"
+        inputMapping: '.upgradeSpec'
+        outputMapping: '{ upgradeResult: { status: .upgradeStatus } }'
+        waitForCompletion: false
+
+    - name: on-incident-detected
+      on:
+        contextChange:
+          filter: '.incidentDetected != null and .incidentResult == null'
+      subCase:
+        namespace: ops
+        name: incident-response
+        version: "1.0"
+        inputMapping: '.incidentData'
+        outputMapping: '{ incidentResult: { status: .incidentStatus, assessment: .incidentAssessment } }'
+        waitForCompletion: false
+
+    - name: on-scaling-required
+      on:
+        contextChange:
+          filter: '.scalingRequired != null and .scalingResult == null'
+      subCase:
+        namespace: ops
+        name: scaling-event
+        version: "1.0"
+        inputMapping: '.scalingRequired'
+        outputMapping: '{ scalingResult: { status: .scalingStatus } }'
+        waitForCompletion: false
+
+    - name: on-compliance-violation
+      on:
+        contextChange:
+          filter: '.complianceViolation != null and .complianceResult == null'
+      subCase:
+        namespace: ops
+        name: compliance-remediation
+        version: "1.0"
+        inputMapping: '.violationData'
+        outputMapping: '{ complianceResult: { status: .complianceStatus, assessment: .complianceAssessment } }'
+        waitForCompletion: false
+
+    - name: on-approval-required
+      on:
+        contextChange:
+          filter: '.approvalRequired != null and .approvalResult == null'
+      subCase:
+        namespace: ops
+        name: deployment-approval
+        version: "1.0"
+        inputMapping: '.approvalRequired'
+        outputMapping: '{ approvalResult: { decision: .approvalDecision, record: .decisionRecord } }'
+        waitForCompletion: false
