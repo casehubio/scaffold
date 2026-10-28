@@ -6,6 +6,7 @@ import io.casehub.api.view.CaseInstanceView;
 import io.casehub.flow.service.CaseDetail;
 import io.casehub.flow.service.CaseService;
 import io.casehub.flow.service.CaseSummary;
+import io.casehub.flow.service.SubCaseSummary;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Alternative;
@@ -36,8 +37,14 @@ public class EmbeddedCaseService implements CaseService {
     public CaseDetail getCaseDetail(UUID caseId, String tenancyId) {
         var instance = engineCaseApi.getCaseById(caseId, tenancyId);
         if (instance == null) return null;
+        var planItems = engineCaseApi.getPlanItems(caseId, tenancyId);
+        var subCases = planItems.stream()
+                .filter(pi -> pi.subCaseIds() != null && !pi.subCaseIds().isEmpty())
+                .flatMap(pi -> pi.subCaseIds().stream()
+                        .map(subId -> new SubCaseSummary(subId, pi.capabilityName(), pi.status().name())))
+                .toList();
         return new CaseDetail(instance.caseId(), instance.name(), instance.status().name(),
-                instance.createdAt(), null, List.of(), List.of(), List.of());
+                instance.createdAt(), null, subCases, List.of(), List.of());
     }
 
     private CaseSummary toSummary(CaseInstanceView view) {

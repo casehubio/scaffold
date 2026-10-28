@@ -4,6 +4,7 @@ import io.casehub.api.model.CaseStatus;
 import io.casehub.flow.service.CaseDetail;
 import io.casehub.flow.service.CaseService;
 import io.casehub.flow.service.CaseSummary;
+import io.casehub.flow.service.SubCaseSummary;
 import io.casehub.flow.service.client.api.EngineCaseRestClient;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -37,7 +38,13 @@ public class ClientCaseService implements CaseService {
     public CaseDetail getCaseDetail(UUID caseId, String tenancyId) {
         var instance = restClient.getCaseById(caseId, tenancyId);
         if (instance == null) return null;
+        var planItems = restClient.getPlanItems(caseId, tenancyId);
+        var subCases = planItems.stream()
+                .filter(pi -> pi.subCaseIds() != null && !pi.subCaseIds().isEmpty())
+                .flatMap(pi -> pi.subCaseIds().stream()
+                        .map(subId -> new SubCaseSummary(subId, pi.capabilityName(), pi.status().name())))
+                .toList();
         return new CaseDetail(instance.caseId(), instance.name(), instance.status().name(),
-                instance.createdAt(), null, List.of(), List.of(), List.of());
+                instance.createdAt(), null, subCases, List.of(), List.of());
     }
 }

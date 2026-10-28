@@ -3,7 +3,9 @@ package io.casehub.flow.service.client;
 import io.casehub.flow.service.client.api.EngineCaseRestClient;
 import io.casehub.api.model.CaseStatus;
 import io.casehub.api.view.CaseInstanceView;
+import io.casehub.api.model.TaskStatus;
 import io.casehub.api.view.CasePage;
+import io.casehub.api.view.PlanItemView;
 import io.casehub.flow.service.CaseDetail;
 import io.casehub.flow.service.CaseSummary;
 import org.junit.jupiter.api.Test;
@@ -35,19 +37,25 @@ class ClientCaseServiceTest {
     }
 
     @Test
-    void getCaseDetailDelegatesViaRestClient() {
+    void getCaseDetailDelegatesViaRestClientWithSubCases() {
         var restClient = mock(EngineCaseRestClient.class);
         var caseId = UUID.randomUUID();
+        var subCaseId = UUID.randomUUID();
         var view = new CaseInstanceView(caseId, CaseStatus.RUNNING,
                 "scaffold", "compliance-audit", "1.0.0", Instant.now(), null);
+        var planItem = new PlanItemView(UUID.randomUUID(), "delegate-to-ops",
+                TaskStatus.RUNNING, "CaseTask", null, "compliance-check", List.of(subCaseId));
         when(restClient.getCaseById(caseId, "t1")).thenReturn(view);
+        when(restClient.getPlanItems(caseId, "t1")).thenReturn(List.of(planItem));
 
         var service = new ClientCaseService(restClient);
         CaseDetail detail = service.getCaseDetail(caseId, "t1");
 
         assertThat(detail).isNotNull();
         assertThat(detail.caseId()).isEqualTo(caseId);
-        assertThat(detail.caseType()).isEqualTo("compliance-audit");
+        assertThat(detail.subCases()).hasSize(1);
+        assertThat(detail.subCases().get(0).caseId()).isEqualTo(subCaseId);
+        assertThat(detail.subCases().get(0).caseType()).isEqualTo("compliance-check");
     }
 
     @Test
