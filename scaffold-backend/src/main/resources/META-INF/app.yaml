@@ -62,6 +62,9 @@ app:
     scaffold-approvals:
       endpoint: /api/scaffold/approvals
       source: approval-service
+    catalogue:
+      endpoint: /api/scaffold/catalogue
+      source: topology-catalogue-service
 
   connections:
     reconciliation-events:

@@ -54,11 +54,11 @@ class AppResourceTest {
         assertThat(entity.tabs()).hasSize(8);
         assertThat(entity.tabs().stream().map(AppTab::id).toList())
             .containsExactly("fleet", "deploy", "health", "drift", "situations", "topology", "updates", "cases");
-        assertThat(entity.datasets()).hasSize(9);
+        assertThat(entity.datasets()).hasSize(10);
         assertThat(entity.datasets().stream().map(AppDataset::name).toList())
             .containsExactlyInAnyOrder("applications", "deployments", "clusters",
                 "reconciliation", "cases", "approvals", "topology",
-                "scaffold-cases", "scaffold-approvals");
+                "scaffold-cases", "scaffold-approvals", "catalogue");
         assertThat(entity.datasets().stream().map(AppDataset::endpoint).toList())
             .allMatch(e -> e.startsWith("/api/ops/") || e.startsWith("/api/scaffold/"));
     }
