@@ -1,4 +1,4 @@
-import { rows, columns, dataTable, title } from "@casehubio/pages-ui";
+import { rows, columns, dataTable, title, actionButton } from "@casehubio/pages-ui";
 import { lookup, col, groupBy } from "@casehubio/pages-ui";
 
 export const deployView = rows(
@@ -11,6 +11,16 @@ export const deployView = rows(
       col("prerequisites", "Prerequisites"),
     )),
     sortable: true,
+    selection: "single",
+    selectionKey: "name",
+  }),
+  actionButton({
+    label: "Deploy Selected Topology",
+    url: "/api/scaffold/catalogue/#{selection.catalogue.name}/deploy",
+    method: "POST",
+    confirm: "Deploy topology #{selection.catalogue.name}?",
+    style: "primary",
+    onSuccess: { refresh: ["catalogue"], message: "Deployment started" },
   }),
   title("Deployment Records", "h2"),
   columns([6, 6],
