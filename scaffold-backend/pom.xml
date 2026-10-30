@@ -35,6 +35,12 @@
             <artifactId>casehub-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- optional dep of mindmap-intelligence — Quarkus CDI needs it on the classpath -->
+        <dependency>
+            <groupId>io.casehub</groupId>
+            <artifactId>casehub-neocortex-annotation-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.casehub</groupId>
             <artifactId>casehub-engine-rest</artifactId>
@@ -104,6 +110,12 @@
         <dependency>
             <groupId>io.casehub</groupId>
             <artifactId>casehub-ops-service</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.casehub</groupId>
+            <artifactId>casehub-ops-container</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
@@ -367,6 +379,19 @@
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
             </properties>
+        </profile>
+        <profile>
+            <id>macos-native-transport</id>
+            <activation>
+                <os><family>mac</family></os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-kqueue</artifactId>
+                    <classifier>osx-aarch_64</classifier>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>
