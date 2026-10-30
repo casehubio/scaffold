@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.casehub</groupId>
+
+    <parent>
+        <groupId>io.casehub</groupId>
+        <artifactId>casehub-parent</artifactId>
+        <version>0.4-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
     <artifactId>scaffold</artifactId>
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -14,37 +21,24 @@
     </modules>
 
     <properties>
-        <casehub.version>0.4-SNAPSHOT</casehub.version>
         <version.mosaic>${casehub.version}</version.mosaic>
-        <maven.compiler.release>21</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus.platform.version>3.32.2</quarkus.platform.version>
-        <quarkus-quinoa.version>2.8.3</quarkus-quinoa.version>
+        <jackson-jq.version>1.6.5</jackson-jq.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.quarkiverse.quinoa</groupId>
-                <artifactId>quarkus-quinoa</artifactId>
-                <version>${quarkus-quinoa.version}</version>
+                <groupId>net.thisptr</groupId>
+                <artifactId>jackson-jq</artifactId>
+                <version>${jackson-jq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.thisptr</groupId>
+                <artifactId>jackson-jq-extra</artifactId>
+                <version>${jackson-jq.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>casehubio GitHub Packages</name>
-            <url>https://maven.pkg.github.com/casehubio/*</url>
-            <releases><enabled>false</enabled></releases>
-
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <repository>
