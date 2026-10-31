@@ -68,6 +68,7 @@ public class EmbeddedTopologyCatalogueService implements TopologyCatalogueServic
 
     @Override
     public TopologyPlan getTopologyPlan(String name) {
+        validateTopologyName(name);
         DesiredStateGraph graph = compilerService.compileTopology(name);
         var transitionPlan = planner.plan(graph, new ActualState(Map.of()));
 
@@ -81,6 +82,7 @@ public class EmbeddedTopologyCatalogueService implements TopologyCatalogueServic
 
     @Override
     public DeployResult deploy(String name, String tenancyId) {
+        validateTopologyName(name);
         if (compilerService.isRunning(tenancyId, name)) {
             throw new IllegalStateException("Topology already deployed: " + name);
         }
@@ -130,6 +132,13 @@ public class EmbeddedTopologyCatalogueService implements TopologyCatalogueServic
                 .toList();
     }
 
+    private void validateTopologyName(String topologyName) {
+        Path resolved = Path.of(topologyBasePath, topologyName).normalize();
+        if (!resolved.startsWith(Path.of(topologyBasePath).normalize())) {
+            throw new IllegalArgumentException("Invalid topology name: " + topologyName);
+        }
+    }
+
     private Map<String, String> readMetadata(String name) {
         String content = readFileFromTopology(name, "topology-metadata.yaml");
         if (content == null) return Map.of();
@@ -146,6 +155,7 @@ public class EmbeddedTopologyCatalogueService implements TopologyCatalogueServic
     }
 
     private String readFileFromTopology(String topologyName, String fileName) {
+        validateTopologyName(topologyName);
         Path file = Path.of(topologyBasePath, topologyName, fileName);
         if (!Files.isRegularFile(file)) return null;
         try {
