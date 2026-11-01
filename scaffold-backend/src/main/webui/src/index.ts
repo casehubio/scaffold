@@ -20,6 +20,7 @@ import { situationsView } from "./views/situations";
 import { updatesView } from "./views/updates";
 import { topologyView } from "./views/topology";
 import { setupNavigation, configureAppNavigation } from "./navigation";
+import { registerTopologyStencils } from "./components/topology-stencil";
 
 type TabEntry = [string, ...unknown[]];
 
@@ -119,5 +120,7 @@ async function start() {
     });
   }
 }
+
+registerTopologyStencils();
 
 start().catch(console.error);

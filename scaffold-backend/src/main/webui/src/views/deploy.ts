@@ -1,5 +1,6 @@
-import { rows, columns, dataTable, title, actionButton } from "@casehubio/pages-ui";
+import { rows, columns, dataTable, title, actionButton, hostPanel } from "@casehubio/pages-ui";
 import { lookup, col, groupBy } from "@casehubio/pages-ui";
+import "../components/catalogue-detail";
 
 export const deployView = rows(
   title("Topology Catalogue", "h2"),
@@ -21,6 +22,10 @@ export const deployView = rows(
     confirm: "Deploy topology #{selection.catalogue.name}?",
     style: "primary",
     onSuccess: { refresh: ["catalogue"], message: "Deployment started" },
+  }),
+  hostPanel("catalogue-detail", {
+    endpoint: "/api/scaffold/catalogue",
+    "topology-name": "#{selection.catalogue.name}",
   }),
   title("Deployment Records", "h2"),
   columns([6, 6],
