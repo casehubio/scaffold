@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ class EmbeddedCaseServiceTest {
         var view = new CaseInstanceView(caseId, CaseStatus.RUNNING,
                 "ops", "drift-remediation", "1.0", Instant.now(), null);
         when(engineApi.listCases(eq(CaseStatus.RUNNING), isNull(), isNull(),
-                eq("tenant-1"), eq(0), eq(100)))
+                eq("tenant-1"), eq(Optional.of(0)), eq(Optional.of(100)), eq(Optional.empty())))
                 .thenReturn(new CasePage(List.of(view), 1, false));
 
         var service = new EmbeddedCaseService(engineApi);
