@@ -11,6 +11,7 @@ import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -42,12 +43,12 @@ public class EmbeddedApprovalService implements ApprovalService {
 
     @Override
     public void approve(UUID approvalId, String actorId) {
-        opsApprovalApi.approve(approvalId, actorId);
+        opsApprovalApi.approve(approvalId, Optional.ofNullable(actorId));
     }
 
     @Override
     public void reject(UUID approvalId, String actorId, String reason) {
-        opsApprovalApi.reject(approvalId, actorId, reason);
+        opsApprovalApi.reject(approvalId, Optional.ofNullable(actorId), Optional.ofNullable(reason));
     }
 
     private ApprovalSummary toSummary(ApprovalView view) {

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +42,7 @@ class EmbeddedApprovalServiceTest {
         var service = new EmbeddedApprovalService(opsApi);
         service.approve(id, "actor-1");
 
-        verify(opsApi).approve(id, "actor-1");
+        verify(opsApi).approve(id, Optional.of("actor-1"));
     }
 
     @Test
@@ -52,6 +53,19 @@ class EmbeddedApprovalServiceTest {
         var service = new EmbeddedApprovalService(opsApi);
         service.reject(id, "actor-1", "Too risky");
 
-        verify(opsApi).reject(id, "actor-1", "Too risky");
+        verify(opsApi).reject(id, Optional.of("actor-1"), Optional.of("Too risky"));
+    }
+
+    @Test
+    void absentActorAndReasonDelegateToApiDefaults() {
+        var opsApi = mock(OpsApprovalApi.class);
+        var id = UUID.randomUUID();
+        var service = new EmbeddedApprovalService(opsApi);
+
+        service.approve(id, null);
+        service.reject(id, null, null);
+
+        verify(opsApi).approve(id, Optional.empty());
+        verify(opsApi).reject(id, Optional.empty(), Optional.empty());
     }
 }

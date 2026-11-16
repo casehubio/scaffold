@@ -13,6 +13,7 @@ import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -29,7 +30,8 @@ public class EmbeddedCaseService implements CaseService {
 
     @Override
     public List<CaseSummary> listActiveCases(String tenancyId) {
-        var page = engineCaseApi.listCases(CaseStatus.RUNNING, null, null, tenancyId, 0, 100);
+        var page = engineCaseApi.listCases(CaseStatus.RUNNING, null, null, tenancyId,
+                Optional.of(0), Optional.of(100), Optional.empty());
         return page.items().stream().map(this::toSummary).toList();
     }
 

@@ -1,6 +1,7 @@
 package io.casehub.flow.graphql;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -65,6 +66,7 @@ class GraphQLEndpointIT {
                 .get("/q/graphql-ui")
                 .then()
                 .statusCode(200)
-                .body(containsString("GraphiQL"));
+                .contentType(ContentType.HTML)
+                .body(containsString("id=\"graphiql\""));
     }
 }
